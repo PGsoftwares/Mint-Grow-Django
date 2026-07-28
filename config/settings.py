@@ -90,14 +90,25 @@ DATABASES = {
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
     
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": "mintgrow",
+    #     "USER": "postgres",
+    #     "PASSWORD": "1234",
+    #     "HOST": "127.0.0.1",
+    #     "PORT": "5432",
+    # }
+    
+    DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "mintgrow",
-        "USER": "postgres",
-        "PASSWORD": "1234",
-        "HOST": "127.0.0.1",
+        "USER": "mintgrowuser",
+        "PASSWORD": "MintGrow@123#!",
+        "HOST": "localhost",
         "PORT": "5432",
     }
+}
 }
 
 
