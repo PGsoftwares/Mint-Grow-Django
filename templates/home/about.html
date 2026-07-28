@@ -1,0 +1,127 @@
+{% extends "layouts/site.html" %}
+{% load static %}
+
+{% block title %}
+About Us | Mint Grow Farm
+{% endblock %}
+
+{% block meta_description %}
+Learn about Mint Grow Farm, our farmer partnerships, sustainable agricultural practices and trusted farm-to-market supply chain.
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <h1>About Us</h1>
+
+        <p>
+            Empowering farmers and delivering trusted agricultural products.
+        </p>
+    </div>
+</section>
+
+
+<!-- About Section -->
+<section class="section about-section" id="about">
+    <div class="container about-grid">
+
+        <div class="about-images">
+            <img
+                class="about-main-image"
+                src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=900&q=80"
+                alt="Farmer working in an agricultural field"
+                loading="lazy"
+            >
+
+            <img
+                class="about-small-image"
+                src="https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=700&q=80"
+                alt="Green agricultural field"
+                loading="lazy"
+            >
+
+            <div class="experience-card">
+                <strong>20+</strong>
+                Years of experience
+            </div>
+        </div>
+
+        <div class="about-content">
+            <span class="eyebrow">
+                About Our Company
+            </span>
+
+            <h2>
+                Empowering farmers through an integrated value chain
+            </h2>
+
+            <p>
+                Mint Grow Farm works directly with farming communities
+                to improve productivity, market access and long-term
+                sustainability.
+            </p>
+
+            <p>
+                Our technology-enabled supply chain delivers transparent,
+                safe and reliable agricultural products.
+            </p>
+
+            <ul class="about-list">
+                <li>
+                    <span>✓</span>
+                    Direct partnership with farmers
+                </li>
+
+                <li>
+                    <span>✓</span>
+                    Complete farm-to-customer traceability
+                </li>
+
+                <li>
+                    <span>✓</span>
+                    Reliable quality standards
+                </li>
+            </ul>
+            
+            <a
+                href="{% url 'contact' %}"
+                class="primary-btn"
+            >
+                Talk to our team
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Statistics Section -->
+<section class="stats">
+    <div class="container stats-grid">
+
+        <div class="stat-item">
+            <strong>30,000+</strong>
+            <span>Registered Farmers</span>
+        </div>
+
+        <div class="stat-item">
+            <strong>45,000+</strong>
+            <span>Acres of Farmland</span>
+        </div>
+
+        <div class="stat-item">
+            <strong>250+</strong>
+            <span>Villages Covered</span>
+        </div>
+
+        <div class="stat-item">
+            <strong>46+</strong>
+            <span>Markets Served</span>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

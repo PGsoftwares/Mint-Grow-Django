@@ -1,0 +1,80 @@
+{% extends "layouts/customer_app.html" %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+
+            <div class="page-pretitle">
+                Customer
+            </div>
+
+            <h2 class="page-title">
+                My Dashboard
+            </h2>
+
+        </div>
+    </div>
+</div>
+
+<div class="row row-deck row-cards">
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="subheader">
+                    Welcome
+                </div>
+
+                <h2 class="mt-2">
+                    Welcome, {{ request.user.name }}
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Manage your Mint Grow Farm account from here.
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="subheader">
+                    Profile Status
+                </div>
+
+                <div class="h2 mt-2">
+                    {{ profile_status }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="subheader">
+                    Account Status
+                </div>
+
+                <div class="h2 mt-2">
+                    {{ account_status }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "layouts/site.html" %}
+{% load static %}
+
+{% block title %}
+    Categories | Mint Grow Farm
+{% endblock %}
+
+{% block meta_description %}
+    Explore fresh agricultural products from Mint Grow Farm.
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+
+        <h1>Product Categories</h1>
+
+        <p>
+            Explore our complete agricultural product range.
+        </p>
+
+    </div>
+</section>
+
+
+<!-- Categories -->
+<section class="section categories-page">
+    <div class="container">
+
+        <div class="categories-grid">
+
+            {% for category in categories %}
+
+                <a
+                    href="{% url 'public_category_list' %}?category={{ category.slug }}"
+                    class="category-card"
+                >
+
+                    <div class="category-image">
+
+                        {% if category.image %}
+
+                            <img
+                                src="{{ category.image.url }}"
+                                alt="{{ category.name }}"
+                                loading="lazy" 
+                            >
+
+                        {% else %}
+
+                            <div class="category-placeholder">
+                                🌿
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="category-content">
+
+                        <h3>
+                            {{ category.name }}
+                        </h3>
+
+                        <p>
+                            {% if category.description %}
+                                {{ category.description|truncatechars:130 }}
+                            {% else %}
+                                Explore fresh and responsibly sourced
+                                {{ category.name|lower }} products.
+                            {% endif %}
+                        </p>
+
+                        <span class="category-link">
+                            View Products
+                            <span aria-hidden="true">→</span>
+                        </span>
+
+                    </div>
+
+                </a>
+
+            {% empty %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state-icon">
+                        🌿
+                    </div>
+
+                    <h2>No categories available</h2>
+
+                    <p>
+                        Product categories will appear here once they are added.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- CTA -->
+<!-- <section class="categories-cta">
+    <div class="container">
+
+        <div class="categories-cta-content">
+
+            <div>
+                <h2>Need a Custom Product List?</h2>
+
+                <p>
+                    Send your product requirements to our sales team.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'contact' %}"
+                class="btn btn-light"
+            >
+                Send Enquiry
+            </a>
+
+        </div>
+
+    </div>
+</section> -->
+
+{% endblock %}

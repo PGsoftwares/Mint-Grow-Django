@@ -1,0 +1,121 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+    Delete Product Category
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+            <div class="page-pretitle">
+                Product Management
+            </div>
+
+            <h2 class="page-title">
+                Delete Product Category
+            </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+            <a
+                href="{% url 'category_list' %}"
+                class="btn btn-secondary"
+            >
+                Back to Categories
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-lg-8 col-xl-6">
+
+        <div class="card">
+
+            <div class="card-status-top bg-danger"></div>
+
+            <div class="card-header">
+                <h3 class="card-title text-danger">
+                    Confirm Category Deletion
+                </h3>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+
+                    {% if category.image %}
+                        <img
+                            src="{{ category.image.url }}"
+                            alt="{{ category.name }}"
+                            class="rounded border me-3"
+                            style="
+                                width: 80px;
+                                height: 80px;
+                                object-fit: cover;
+                            "
+                        >
+                    {% else %}
+                        <span
+                            class="avatar avatar-xl bg-secondary-lt me-3"
+                        >
+                            {{ category.name|slice:":1"|upper }}
+                        </span>
+                    {% endif %}
+
+                    <div>
+                        <h3 class="mb-1">
+                            {{ category.name }}
+                        </h3>
+
+                        <div class="text-secondary">
+                            {{ category.full_name }}
+                        </div>
+
+                        {% if category.children.exists %}
+                            <div class="text-danger mt-2">
+                                This category contains subcategories.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="alert alert-danger mt-4 mb-0">
+                    <div class="fw-bold mb-1">
+                        Warning
+                    </div>
+
+                    Deleting this category may also delete all nested
+                    subcategories when the parent field uses
+                    <code>on_delete=models.CASCADE</code>.
+                </div>
+            </div>
+
+            <div class="card-footer text-end">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <a
+                        href="{% url 'category_list' %}"
+                        class="btn btn-link"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                    >
+                        Delete Category
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>
+        {% block title %}Admin Dashboard{% endblock %}
+        | Mint Grow Farm
+    </title>
+
+    <!-- Apply saved theme and sidebar state before CSS loads -->
+    <script>
+        (function () {
+            const savedTheme =
+                localStorage.getItem("mintgrow-theme") || "light";
+
+            document.documentElement.setAttribute(
+                "data-bs-theme",
+                savedTheme
+            );
+
+            const sidebarCollapsed =
+                localStorage.getItem(
+                    "mintgrow-sidebar-collapsed"
+                ) === "true";
+
+            if (sidebarCollapsed) {
+                document.documentElement.classList.add(
+                    "sidebar-pre-collapsed"
+                );
+            }
+        })();
+    </script>
+
+    <link
+        href="{% static 'tabler/css/tabler.min.css' %}"
+        rel="stylesheet"
+    >
+
+    <link
+        href="{% static 'tabler/css/tabler-flags.min.css' %}"
+        rel="stylesheet"
+    >
+
+    <link
+        href="{% static 'tabler/css/tabler-payments.min.css' %}"
+        rel="stylesheet"
+    >
+
+    <link
+        href="{% static 'tabler/css/tabler-vendors.min.css' %}"
+        rel="stylesheet"
+    >
+
+    <link
+        href="{% static 'tabler/css/custom.css' %}"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css"
+    >
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="page">
+
+        {% include "partials/sidebar.html" %}
+
+        <div class="page-wrapper">
+
+            {% include "partials/navbar.html" %}
+
+            <div class="page-body">
+                <div class="container-xl">
+
+                    {% include "partials/messages.html" %}
+
+                    {% block content %}{% endblock %}
+
+                </div>
+            </div>
+
+            <footer class="footer footer-transparent d-print-none">
+                <div class="container-xl">
+                    <div class="text-center text-secondary">
+                        &copy; {% now "Y" %} Mint Grow Farm
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="{% static 'tabler/js/tabler.min.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const html = document.documentElement;
+            const body = document.body;
+
+            const themeToggle =
+                document.getElementById("themeToggle");
+
+            const lightModeIcon =
+                document.getElementById("lightModeIcon");
+
+            const darkModeIcon =
+                document.getElementById("darkModeIcon");
+
+            const sidebarToggle =
+                document.getElementById("sidebarToggle");
+
+            const sidebar =
+                document.getElementById("adminSidebar");
+
+            /*
+             * Theme
+             */
+            function updateThemeIcons(theme) {
+                if (!lightModeIcon || !darkModeIcon) {
+                    return;
+                }
+
+                if (theme === "dark") {
+                    /*
+                     * Show sun icon because clicking it
+                     * changes the page to light mode.
+                     */
+                    lightModeIcon.classList.remove("d-none");
+                    darkModeIcon.classList.add("d-none");
+                } else {
+                    /*
+                     * Show moon icon because clicking it
+                     * changes the page to dark mode.
+                     */
+                    lightModeIcon.classList.add("d-none");
+                    darkModeIcon.classList.remove("d-none");
+                }
+            }
+
+            function applyTheme(theme) {
+                html.setAttribute(
+                    "data-bs-theme",
+                    theme
+                );
+
+                /*
+                 * This is optional if the sidebar does not
+                 * contain its own data-bs-theme attribute.
+                 */
+                if (sidebar) {
+                    sidebar.removeAttribute("data-bs-theme");
+                }
+
+                localStorage.setItem(
+                    "mintgrow-theme",
+                    theme
+                );
+
+                updateThemeIcons(theme);
+            }
+
+            const currentTheme =
+                localStorage.getItem("mintgrow-theme") || "light";
+
+            applyTheme(currentTheme);
+
+            if (themeToggle) {
+                themeToggle.addEventListener("click", function () {
+                    const activeTheme =
+                        html.getAttribute("data-bs-theme") || "light";
+
+                    const nextTheme =
+                        activeTheme === "dark"
+                            ? "light"
+                            : "dark";
+
+                    applyTheme(nextTheme);
+                });
+            }
+
+            /*
+             * Sidebar collapse
+             */
+            const savedSidebarState =
+                localStorage.getItem(
+                    "mintgrow-sidebar-collapsed"
+                ) === "true";
+
+            if (savedSidebarState) {
+                body.classList.add("sidebar-collapsed");
+            }
+
+            /*
+             * Remove temporary class added before CSS loaded.
+             */
+            html.classList.remove("sidebar-pre-collapsed");
+
+            function updateSidebarButton() {
+                if (!sidebarToggle) {
+                    return;
+                }
+
+                const isCollapsed =
+                    body.classList.contains(
+                        "sidebar-collapsed"
+                    );
+
+                sidebarToggle.setAttribute(
+                    "aria-label",
+                    isCollapsed
+                        ? "Expand sidebar"
+                        : "Collapse sidebar"
+                );
+
+                sidebarToggle.setAttribute(
+                    "title",
+                    isCollapsed
+                        ? "Expand sidebar"
+                        : "Collapse sidebar"
+                );
+
+                sidebarToggle.setAttribute(
+                    "aria-expanded",
+                    isCollapsed ? "false" : "true"
+                );
+            }
+
+            updateSidebarButton();
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener("click", function () {
+                    const isCollapsed =
+                        body.classList.toggle(
+                            "sidebar-collapsed"
+                        );
+
+                    localStorage.setItem(
+                        "mintgrow-sidebar-collapsed",
+                        isCollapsed.toString()
+                    );
+
+                    updateSidebarButton();
+                });
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

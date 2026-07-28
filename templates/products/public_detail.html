@@ -1,0 +1,263 @@
+{% extends "layouts/site.html" %}
+{% load static %}
+
+{% block title %}
+{{ product.name }} | Mint Grow Farm
+{% endblock %}
+
+{% block meta_description %}
+{% if product.short_description %}{{ product.short_description|truncatechars:155 }}{% else %}View {{ product.name }} from Mint Grow Farm.{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<!-- Product Detail -->
+<section class="section product-detail-section">
+    <div class="container">
+
+        <!-- Breadcrumb -->
+        <nav
+            class="breadcrumb"
+            aria-label="Breadcrumb"
+        >
+            <a href="{% url 'home' %}">
+                Home
+            </a>
+
+            <span>/</span>
+
+            <a href="{% url 'public_product_list' %}">
+                Products
+            </a>
+
+            <span>/</span>
+
+            <a
+                href="{% url 'public_product_list' %}?category={{ product.category.slug }}"
+            >
+                {{ product.category.name }}
+            </a>
+
+            <span>/</span>
+
+            <span>
+                {{ product.name }}
+            </span>
+        </nav>
+
+
+        <div class="product-detail-grid">
+
+            <!-- Product Image -->
+            <div class="product-detail-image">
+
+                {% if product.image %}
+                    <img
+                        src="{{ product.image.url }}"
+                        alt="{{ product.name }}"
+                    >
+                {% else %}
+                    <div class="product-detail-placeholder">
+                        🌿
+                    </div>
+                {% endif %}
+
+                {% if product.featured %}
+                    <span class="featured-badge">
+                        Featured
+                    </span>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Product Information -->
+            <div class="product-detail-content">
+
+                <span class="tag">
+                    {{ product.category.name }}
+                </span>
+
+                <h1>
+                    {{ product.name }}
+                </h1>
+
+                {% if product.short_description %}
+                    <p class="product-short-description">
+                        {{ product.short_description }}
+                    </p>
+                {% endif %}
+
+                <div class="product-detail-price">
+                    ₹{{ product.price|floatformat:2 }}
+                </div>
+
+                <div class="product-meta">
+
+                    <div class="product-meta-row">
+                        <span>SKU</span>
+
+                        <strong>
+                            {{ product.sku|default:"Not available" }}
+                        </strong>
+                    </div>
+
+                    <div class="product-meta-row">
+                        <span>Category</span>
+
+                        <a
+                            href="{% url 'public_product_list' %}?category={{ product.category.slug }}"
+                        >
+                            {{ product.category.name }}
+                        </a>
+                    </div>
+
+                    <div class="product-meta-row">
+                        <span>Availability</span>
+
+                        <strong class="available-text">
+                            Available
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div class="product-actions">
+
+                    <a
+                        href="{% url 'contact' %}?product={{ product.name|urlencode }}"
+                        class="btn btn-primary"
+                    >
+                        Send Enquiry
+                    </a>
+
+                    <a
+                        href="{% url 'public_product_list' %}"
+                        class="btn product-back-btn"
+                    >
+                        Back to Products
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Full Description -->
+        <div class="product-description-card">
+
+            <h2>Product Description</h2>
+
+            {% if product.description %}
+                <div class="product-description">
+                    {{ product.description|linebreaks }}
+                </div>
+            {% elif product.short_description %}
+                <div class="product-description">
+                    {{ product.short_description|linebreaks }}
+                </div>
+            {% else %}
+                <p>
+                    More information about this product will be available soon.
+                </p>
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Related Products -->
+{% if related_products %}
+    <section class="section related-products-section">
+        <div class="container">
+
+            <h2 class="section-title">
+                Related Products
+            </h2>
+
+            <p class="section-text">
+                Explore more products from the
+                {{ product.category.name }} category.
+            </p>
+
+            <div class="grid products-grid">
+
+                {% for related_product in related_products %}
+
+                    <article class="product-card">
+
+                        <a
+                            href="{% url 'public_product_detail' related_product.slug %}"
+                            class="product-image-link"
+                        >
+                            <div class="product-img">
+
+                                {% if related_product.image %}
+                                    <img
+                                        src="{{ related_product.image.url }}"
+                                        alt="{{ related_product.name }}"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <div class="product-placeholder">
+                                        🌿
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        </a>
+
+                        <div class="product-body">
+
+                            <span class="tag">
+                                {{ related_product.category.name }}
+                            </span>
+
+                            <h3>
+                                <a
+                                    href="{% url 'public_product_detail' related_product.slug %}"
+                                >
+                                    {{ related_product.name }}
+                                </a>
+                            </h3>
+
+                            <p>
+                                {% if related_product.short_description %}
+                                    {{ related_product.short_description|truncatechars:100 }}
+                                {% else %}
+                                    {{ related_product.description|truncatechars:100 }}
+                                {% endif %}
+                            </p>
+
+                            <div class="product-footer">
+
+                                <div class="product-price">
+                                    ₹{{ related_product.price|floatformat:2 }}
+                                </div>
+
+                                <a
+                                    href="{% url 'public_product_detail' related_product.slug %}"
+                                    class="product-link"
+                                >
+                                    View Details →
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </section>
+{% endif %}
+
+{% endblock %}

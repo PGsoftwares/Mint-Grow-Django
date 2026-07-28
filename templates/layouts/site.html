@@ -1,0 +1,262 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="{% block meta_description %}Mint Grow Farm agricultural products.{% endblock %}">
+
+    <title>{% block title %}Mint Grow Farm{% endblock %}</title>
+
+    <link rel="icon" type="image/x-icon" href="{% static 'tabler/img/logo.png' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'tabler/css/home.css' %}">
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container navbar">
+
+            <a href="{% url 'home' %}" class="logo">
+                <div class="logo-icon">
+                    <img src="{% static 'tabler/img/logo.png' %}" alt="Mint Grow">
+                </div>
+
+                <div class="logo-text">
+                    Mint Grow
+                    <span>Growing goodness</span>
+                </div>
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li>
+                    <a href="{% url 'home' %}#home">
+                        Home
+                    </a>
+                </li>
+
+                <a href="{% url 'about' %}">
+                    About Us
+                </a>
+
+                <li>
+                    <a href="{% url 'public_category_list' %}">
+                        Categories
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'public_product_list' %}">
+                        Products
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'contact' %}">
+                        Contact
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-actions">
+
+                {% if request.user.is_authenticated %}
+
+                    {% if request.user.role == "admin" %}
+                        <a
+                            href="{% url 'dashboard' %}"
+                            class="primary-btn"
+                        >
+                            Dashboard
+                        </a>
+                    {% else %}
+                        <a
+                            href="{% url 'customer_dashboard' %}"
+                            class="primary-btn"
+                        >
+                            My Dashboard
+                        </a>
+                    {% endif %}
+
+                {% else %}
+                    <a
+                        href="{% url 'login' %}"
+                        class="primary-btn"
+                    >
+                        Login
+                    </a>
+                {% endif %}
+
+                <button
+                    type="button"
+                    class="menu-button"
+                    id="menuButton"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
+
+            </div>
+        </div>
+    </header>
+
+    {% include "partials/messages.html" %}
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+
+            <div>
+                <a href="{% url 'home' %}" class="logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'tabler/img/logo.png' %}" alt="Mint Grow">
+                    </div>
+
+                    <div class="logo-text">
+                        Mint Grow
+                        <span>Growing goodness</span>
+                    </div>
+                </a>
+
+                <p class="footer-about">
+                    An integrated agriculture company delivering fresh,
+                    traceable and sustainable food products.
+                </p>
+            </div>
+
+            <div>
+                <h3>Company</h3>
+
+                <ul class="footer-links">
+                    <li>
+                        <a href="{% url 'home' %}#about">
+                            About Us
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'contact' %}">
+                            Contact
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Explore</h3>
+
+                <ul class="footer-links">
+                    
+                        <li>
+                            <a href="{% url 'home' %}#products">
+                                Categories
+                            </a>
+                        </li>
+                    
+                        <li>
+                            <a href="{% url 'home' %}#products">
+                                Products
+                            </a>
+                        </li>
+                    
+                </ul>
+            </div>
+
+            <div>
+                <h3>Account</h3>
+
+                <ul class="footer-links">
+
+                    {% if request.user.is_authenticated %}
+
+                        {% if request.user.role == "admin" %}
+                            <li>
+                                <a href="{% url 'dashboard' %}">
+                                    Dashboard
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{% url 'customer_dashboard' %}">
+                                    My Dashboard
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                Logout
+                            </a>
+                        </li>
+
+                    {% else %}
+                        <li>
+                            <a href="{% url 'login' %}">
+                                Login
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'register' %}">
+                                Register
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+
+                <div class="footer-bottom-content">
+
+                    <div class="footer-copyright">
+                        © {% now "Y" %} Mint Grow Farm. All rights reserved.
+                    </div>
+
+                    <div class="footer-designed">
+                        Designed with ❤️ by
+                        <a
+                            href="https://pgsoftwares.com"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            PG Softwares
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </footer>
+
+    <script src="{% static 'tabler/js/home.js' %}"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+</html>

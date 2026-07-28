@@ -1,0 +1,72 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+    Create Product
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+            <div class="page-pretitle">
+                Product Management
+            </div>
+
+            <h2 class="page-title">
+                Create Product
+            </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+                Back to Products
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="card mt-3">
+
+    <div class="card-header">
+        <h3 class="card-title">
+            Product Details
+        </h3>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="card-body">
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% include "products/form.html" %}
+
+        </div>
+
+        <div class="card-footer text-end">
+
+            <a
+                href="{% url 'product_list' %}"
+                class="btn btn-outline-secondary"
+            >
+                Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Create Product
+            </button>
+
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}

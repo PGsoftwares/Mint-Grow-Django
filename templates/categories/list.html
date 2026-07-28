@@ -1,0 +1,200 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+    Product Categories
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+            <div class="page-pretitle">
+                Product Management
+            </div>
+
+            <h2 class="page-title">
+                Product Categories
+            </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+            <a
+                href="{% url 'category_create' %}"
+                class="btn btn-primary"
+            >
+                Add Category
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="card mt-3">
+
+    <div class="card-header">
+        <h3 class="card-title">
+            Category List
+        </h3>
+    </div>
+
+    <div class="table-responsive px-3 py-3">
+        <table
+            id="categoryTable"
+            class="table table-vcenter card-table w-100"
+        >
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Category</th>
+                    <th>Parent</th>
+                    <th>Slug</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="w-1">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td>
+                            {% if category.image %}
+                                <img
+                                    src="{{ category.image.url }}"
+                                    alt="{{ category.name }}"
+                                    class="rounded border"
+                                    style="
+                                        width: 64px;
+                                        height: 64px;
+                                        object-fit: cover;
+                                    "
+                                >
+                            {% else %}
+                                <span
+                                    class="avatar bg-secondary-lt"
+                                    style="
+                                        width: 64px;
+                                        height: 64px;
+                                    "
+                                >
+                                    {{ category.name|slice:":1"|upper }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="fw-bold">
+                                {% if category.parent %}
+                                    <span class="text-secondary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-corner-down-right">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M6 6v6a3 3 0 0 0 3 3h10l-4 -4m0 8l4 -4" />
+                                        </svg>
+                                    </span>
+                                {% endif %}
+
+                                {{ category.name }}
+                            </div>
+
+                            <div class="small text-secondary">
+                                {{ category.full_name }}
+                            </div>
+
+                            {% if category.description %}
+                                <div
+                                    class="text-secondary text-truncate mt-1"
+                                    style="max-width: 300px;"
+                                >
+                                    {{ category.description }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if category.parent %}
+                                <span class="badge bg-blue-lt">
+                                    {{ category.parent.name }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-purple-lt">
+                                    Main Category
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="text-secondary">
+                                {{ category.slug }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if category.status == "active" %}
+                                <span class="badge bg-green-lt">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-red-lt">
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td
+                            data-order="{{ category.created_at|date:'Y-m-d H:i:s' }}"
+                        >
+                            {{ category.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td class="text-end">
+                            {% url "category_update" category.id as edit_url %}
+                            {% url "category_toggle_status" category.id as toggle_url %}
+                            {% url "category_delete" category.id as delete_url %}
+
+                            {% include "partials/action_dropdown.html" with edit_url=edit_url toggle_url=toggle_url delete_url=delete_url item_status=category.status show_toggle=True show_delete=True only %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        new DataTable("#categoryTable", {
+            pageLength: 10,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            order: [
+                [5, "desc"]
+            ],
+
+            columnDefs: [
+                {
+                    targets: [0, 6],
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+
+            language: {
+                search: "Search:",
+                searchPlaceholder: "Search categories...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ categories",
+                zeroRecords: "No matching categories found",
+                emptyTable: "No product categories available"
+            }
+        });
+    });
+</script>
+{% endblock %}

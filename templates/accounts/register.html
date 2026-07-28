@@ -1,0 +1,302 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+    class="card card-md"
+    novalidate
+>
+    {% csrf_token %}
+
+    <div class="card-body">
+
+        <h2 class="h2 text-center mb-4">
+            Create your account
+        </h2>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+
+            <label
+                class="form-label"
+                for="{{ form.name.id_for_label }}"
+            >
+                Full name
+            </label>
+
+            {{ form.name }}
+
+            {% if form.name.errors %}
+                <div class="text-danger small mt-1">
+
+                    {% for error in form.name.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="mb-3">
+
+            <label
+                class="form-label"
+                for="{{ form.email.id_for_label }}"
+            >
+                Email address
+            </label>
+
+            {{ form.email }}
+
+            {% if form.email.errors %}
+                <div class="text-danger small mt-1">
+
+                    {% for error in form.email.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="mb-3">
+
+            <label
+                class="form-label"
+                for="{{ form.phone.id_for_label }}"
+            >
+                Phone number
+            </label>
+
+            {{ form.phone }}
+
+            {% if form.phone.errors %}
+                <div class="text-danger small mt-1">
+
+                    {% for error in form.phone.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+        </div>
+
+        <!-- <div class="mb-3">
+
+            <label
+                class="form-label"
+                for="{{ form.profile_photo.id_for_label }}"
+            >
+                Profile Image
+            </label>
+
+            {{ form.profile_image }}
+
+            <div class="form-hint">
+                Optional. Upload JPG, JPEG, PNG, or WebP.
+            </div>
+
+            {% if form.profile_photo.errors %}
+                <div class="text-danger small mt-1">
+
+                    {% for error in form.profile_photo.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+        </div> -->
+
+        <div class="mb-3">
+
+            <label
+                class="form-label"
+                for="{{ form.password.id_for_label }}"
+            >
+                Password
+            </label>
+
+            <div class="input-group input-group-flat">
+
+                {{ form.password }}
+
+                <span class="input-group-text">
+
+                    <a
+                        href="#"
+                        class="link-secondary password-toggle"
+                        data-target="{{ form.password.id_for_label }}"
+                        title="Show password"
+                        aria-label="Show password"
+                    >
+                        <i class="ti ti-eye"></i>
+                    </a>
+
+                </span>
+
+            </div>
+
+            {% if form.password.help_text %}
+                <div class="form-hint">
+                    {{ form.password.help_text|safe }}
+                </div>
+            {% endif %}
+
+            {% if form.password.errors %}
+                <div class="text-danger small mt-1">
+
+                    {% for error in form.password.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="mb-3">
+
+            <label
+                class="form-label"
+                for="{{ form.confirm_password.id_for_label }}"
+            >
+                Confirm password
+            </label>
+
+            <div class="input-group input-group-flat">
+
+                {{ form.confirm_password }}
+
+                <span class="input-group-text">
+
+                    <a
+                        href="#"
+                        class="link-secondary password-toggle"
+                        data-target="{{ form.confirm_password.id_for_label }}"
+                        title="Show password"
+                        aria-label="Show password"
+                    >
+                        <i class="ti ti-eye"></i>
+                    </a>
+
+                </span>
+
+            </div>
+
+            {% if form.confirm_password.errors %}
+                <div class="text-danger small mt-1">
+
+                    {% for error in form.confirm_password.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="form-footer">
+
+            <button
+                type="submit"
+                class="btn btn-primary w-100"
+            >
+                Create account
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+<div class="text-center text-secondary mt-3">
+
+    Already have an account?
+
+    <a href="{% url 'login' %}">
+        Login
+    </a>
+
+</div>
+
+<div class="text-center mt-2">
+
+    <a
+        href="{% url 'home' %}"
+        class="link-secondary"
+    >
+        Back to website
+    </a>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleButtons =
+            document.querySelectorAll(".password-toggle");
+
+        toggleButtons.forEach(function (button) {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const passwordInput = document.getElementById(
+                    button.dataset.target
+                );
+
+                const icon = button.querySelector("i");
+
+                if (!passwordInput || !icon) {
+                    return;
+                }
+
+                const passwordIsHidden =
+                    passwordInput.type === "password";
+
+                passwordInput.type = passwordIsHidden
+                    ? "text"
+                    : "password";
+
+                icon.classList.toggle(
+                    "ti-eye",
+                    !passwordIsHidden
+                );
+
+                icon.classList.toggle(
+                    "ti-eye-off",
+                    passwordIsHidden
+                );
+
+                const label = passwordIsHidden
+                    ? "Hide password"
+                    : "Show password";
+
+                button.title = label;
+                button.setAttribute("aria-label", label);
+            });
+        });
+    });
+</script>
+
+{% endblock %}

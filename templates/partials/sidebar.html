@@ -1,0 +1,185 @@
+{% load static %}
+<aside
+    id="adminSidebar"
+    class="navbar navbar-vertical navbar-expand-lg"
+>
+    <div class="container-fluid">
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebar-menu"
+            aria-controls="sidebar-menu"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <h1 class="navbar-brand navbar-brand-autodark">
+            <a href="{% url 'dashboard' %}" class="navbar-brand navbar-brand-autodark">
+                <img src="{% static 'tabler/img/logo.png' %}"
+                    alt="Mint Grow"
+                    style="height:40px;">
+            </a> Mint Grow
+        </h1>
+
+        <div
+            class="collapse navbar-collapse"
+            id="sidebar-menu"
+        >
+            <ul class="navbar-nav pt-lg-3">
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        href="{% url 'dashboard' %}"
+                    >
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon"
+                            >
+                                <path d="M4 4h6v8h-6z"></path>
+                                <path d="M4 16h6v4h-6z"></path>
+                                <path d="M14 12h6v8h-6z"></path>
+                                <path d="M14 4h6v4h-6z"></path>
+                            </svg>
+
+                        </span>
+
+                        <span class="nav-link-title">
+                            Dashboard
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_update' or request.resolver_match.url_name == 'user_delete' %}active{% endif %}"
+                        href="{% url 'user_list' %}"
+                    >
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-users">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+                            </svg>
+                        </span>
+
+                        <span class="nav-link-title">
+                            Users
+                        </span>
+                    </a>
+                </li>                
+
+                <li class="nav-item dropdown">
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#navbar-products"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="false"
+                        role="button"
+                        aria-expanded="false"
+                    >
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon"
+                            >
+                                <path d="M12 3l8 4.5v9l-8 4.5l-8 -4.5v-9z"/>
+                                <path d="M12 12l8 -4.5"/>
+                                <path d="M12 12v9"/>
+                                <path d="M12 12l-8 -4.5"/>
+                            </svg>
+
+                        </span>
+
+                        <span class="nav-link-title">
+                            Product Management
+                        </span>
+                    </a>
+
+                    <div class="dropdown-menu">
+
+                        <a
+                            class="dropdown-item {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}"
+                            href="{% url 'category_list' %}"
+                        >
+                            Categories
+                        </a>
+
+                        <a
+                            class="dropdown-item {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
+                            href="{% url 'product_list' %}"
+                        >
+                            Products
+                        </a>
+
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <form
+                        method="post"
+                        action="{% url 'logout' %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="nav-link border-0 bg-transparent w-100 text-start"
+                        >
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="icon"
+                                >
+                                    <path d="M10 8l-4 4l4 4"></path>
+                                    <path d="M6 12h12"></path>
+                                    <path d="M18 4v16"></path>
+                                </svg>
+
+                            </span>
+
+                            <span class="nav-link-title">
+                                Logout
+                            </span>
+                        </button>
+                    </form>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</aside>

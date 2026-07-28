@@ -1,0 +1,89 @@
+<tr>
+    <td>
+        <span style="padding-left: {{ category.level }}rem;">
+            {% if category.level %}
+                ↳
+            {% endif %}
+
+            {{ category.name }}
+        </span>
+    </td>
+
+    <td>
+        {% if category.parent %}
+            {{ category.parent.name }}
+        {% else %}
+            <span class="text-muted">Main category</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if category.image %}
+            <img
+                src="{{ category.image.url }}"
+                alt="{{ category.name }}"
+                width="45"
+                height="45"
+                class="rounded object-cover"
+            >
+        {% else %}
+            <span class="text-muted">No image</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if category.status == "active" %}
+            <span class="badge bg-success-lt">
+                Active
+            </span>
+        {% else %}
+            <span class="badge bg-danger-lt">
+                Inactive
+            </span>
+        {% endif %}
+    </td>
+
+    <td class="text-end">
+        <a
+            href="{% url 'category_update' category.id %}"
+            class="btn btn-sm btn-primary"
+        >
+            Edit
+        </a>
+
+        <form
+            method="post"
+            action="{% url 'category_toggle_status' category.id %}"
+            class="d-inline"
+        >
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-sm btn-warning"
+            >
+                Toggle Status
+            </button>
+        </form>
+
+        <form
+            method="post"
+            action="{% url 'category_delete' category.id %}"
+            class="d-inline"
+            onsubmit="return confirm('Delete this category and all its subcategories?');"
+        >
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-sm btn-danger"
+            >
+                Delete
+            </button>
+        </form>
+    </td>
+</tr>
+
+{% for child in category.children.all %}
+    {% include "categories/_category_row.html" with category=child %}
+{% endfor %}

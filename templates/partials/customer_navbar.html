@@ -1,0 +1,76 @@
+<header class="navbar navbar-expand-md d-print-none">
+    <div class="container-xl">
+
+        <div class="navbar-nav flex-row order-md-last ms-auto">
+
+            <div class="nav-item dropdown">
+
+                <a
+                    href="#"
+                    class="nav-link d-flex lh-1 text-reset p-0"
+                    data-bs-toggle="dropdown"
+                >
+
+                    {% if request.user.profile_photo %}
+
+                        <span
+                            class="avatar avatar-sm"
+                            style="
+                                background-image:
+                                url('{{ request.user.profile_photo.url }}');
+                            "
+                        ></span>
+
+                    {% else %}
+
+                        <span class="avatar avatar-sm bg-primary-lt">
+                            {{ request.user.name|slice:":1"|upper }}
+                        </span>
+
+                    {% endif %}
+
+                    <div class="d-none d-xl-block ps-2">
+
+                        <div>
+                            {{ request.user.name }}
+                        </div>
+
+                        <div class="mt-1 small text-secondary">
+                            {{ request.user.email }}
+                        </div>
+
+                    </div>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-end">
+
+                    <a
+                        href="{% url 'home' %}"
+                        class="dropdown-item"
+                    >
+                        Visit Website
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <form
+                        method="post"
+                        action="{% url 'logout' %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="dropdown-item"
+                        >
+                            Logout
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</header>

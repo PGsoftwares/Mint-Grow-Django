@@ -1,0 +1,186 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+            <div class="page-pretitle">
+                Administration
+            </div>
+
+            <h2 class="page-title">
+                Users
+            </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+            <a
+                href="{% url 'user_create' %}"
+                class="btn btn-primary"
+            >
+                Add User
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="card mt-3">
+
+    <div class="card-header">
+        <h3 class="card-title">
+            User List
+        </h3>
+    </div>
+
+    <div class="table-responsive px-3 py-3">
+        <table id="userTable" class="table table-vcenter card-table w-100">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="w-1">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for managed_user in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+
+                                {% if managed_user.profile_image %}
+                                    <span
+                                        class="avatar me-3"
+                                        style="background-image: url('{{ managed_user.profile_image.url }}')"
+                                    ></span>
+                                {% else %}
+                                    <span class="avatar me-3">
+                                        {{ managed_user.name|slice:":1"|upper }}
+                                    </span>
+                                {% endif %}
+
+                                <div>
+                                    <div class="fw-bold">
+                                        {{ managed_user.name }}
+
+                                        {% if managed_user == request.user %}
+                                            <span class="badge bg-blue-lt">
+                                                You
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="text-secondary">
+                                        {{ managed_user.email }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ managed_user.phone|default:"-" }}
+                        </td>
+
+                        <td>
+                            {% if managed_user.role == "admin" %}
+                                <span class="badge bg-purple-lt">
+                                    Admin
+                                </span>
+                            {% else %}
+                                <span class="badge bg-blue-lt">
+                                    Customer
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if managed_user.status == "active" and managed_user.is_active %}
+                                <span class="badge bg-green-lt">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-red-lt">
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td
+                            data-order="{{ managed_user.created_at|date:'Y-m-d H:i:s' }}"
+                        >
+                            {{ managed_user.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td class="text-end">
+                            {% url "user_update" managed_user.id as edit_url %}
+                            {% url "user_toggle_status" managed_user.id as toggle_url %}
+                            {% url "user_delete" managed_user.id as delete_url %}
+
+                            {% if managed_user != request.user and not managed_user.is_superuser %}
+                                {% include "partials/action_dropdown.html" with edit_url=edit_url toggle_url=toggle_url delete_url=delete_url item_status=managed_user.status show_toggle=True show_delete=True only %}
+                            {% else %}
+                                {% include "partials/action_dropdown.html" with edit_url=edit_url show_toggle=False show_delete=False only %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableElement = document.querySelector("#userTable");
+
+        if (!tableElement) {
+            return;
+        }
+
+        new DataTable(tableElement, {
+            pageLength: 10,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            order: [
+                [4, "desc"]
+            ],
+
+            columnDefs: [
+                {
+                    targets: [5],
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+
+            language: {
+                search: "Search:",
+                searchPlaceholder: "Search users...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ users",
+                infoEmpty: "Showing 0 to 0 of 0 users",
+                infoFiltered: "(filtered from _MAX_ total users)",
+                zeroRecords: "No matching users found",
+                emptyTable: "No users available"
+            }
+        });
+    });
+</script>
+{% endblock %}

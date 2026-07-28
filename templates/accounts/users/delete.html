@@ -1,0 +1,86 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}Delete User | Mint Grow{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+
+            <div class="col">
+                <div class="page-pretitle">
+                    User Management
+                </div>
+
+                <h2 class="page-title">
+                    Delete User
+                </h2>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+
+                <div class="card">
+                    <div class="card-body text-center py-5">
+
+                        {% if managed_user.profile_image %}
+                            <img
+                                src="{{ managed_user.profile_image.url }}"
+                                alt="{{ managed_user.name }}"
+                                class="avatar avatar-xl mb-3"
+                            >
+                        {% else %}
+                            <span class="avatar avatar-xl mb-3">
+                                {{ managed_user.name|slice:":1"|upper }}
+                            </span>
+                        {% endif %}
+
+                        <h2>
+                            Delete {{ managed_user.name }}?
+                        </h2>
+
+                        <p class="text-secondary">
+                            This will permanently delete
+                            <strong>{{ managed_user.email }}</strong>.
+                        </p>
+
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="d-flex">
+
+                            <a
+                                href="{% url 'user_list' %}"
+                                class="btn btn-link"
+                            >
+                                Cancel
+                            </a>
+
+                            <form method="post" class="ms-auto">
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger"
+                                >
+                                    Delete User
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

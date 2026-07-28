@@ -1,0 +1,66 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <title>
+        {% block title %}Authentication{% endblock %}
+        | Mint Grow Farm
+    </title>
+
+    <link
+        href="{% static 'tabler/css/tabler.min.css' %}"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    
+
+    <link
+        href="{% static 'tabler/css/custom.css' %}"
+        rel="stylesheet"
+    >
+
+    {% block extra_css %}{% endblock %}
+    
+
+</head>
+
+<body class="d-flex flex-column">
+
+    <div class="page page-center">
+
+        <div class="container container-tight py-4">
+
+            <div class="text-center mb-4">
+                <div class="text-center mb-4">
+                    <img src="{% static 'tabler/img/logo.png' %}"
+                        alt="Mint Grow"
+                        style="height:70px;">
+                </div>
+            </div>
+
+            {% include "partials/messages.html" %}
+
+            {% block content %}{% endblock %}
+
+        </div>
+
+    </div>
+
+    <script src="{% static 'tabler/js/tabler.min.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

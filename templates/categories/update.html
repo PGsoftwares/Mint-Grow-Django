@@ -1,0 +1,80 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+    Update Product Category
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+            <div class="page-pretitle">
+                Product Management
+            </div>
+
+            <h2 class="page-title">
+                Update Product Category
+            </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+            <a
+                href="{% url 'category_list' %}"
+                class="btn btn-secondary"
+            >
+                Back to Categories
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            novalidate
+        >
+            <div class="card">
+
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">
+                            Edit Category
+                        </h3>
+
+                        <div class="card-subtitle">
+                            {{ category.full_name }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% include "categories/form.html" %}
+                </div>
+
+                <div class="card-footer text-end">
+                    <a
+                        href="{% url 'category_list' %}"
+                        class="btn btn-link"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Update Category
+                    </button>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

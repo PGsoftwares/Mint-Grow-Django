@@ -1,0 +1,203 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+    Products
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+            <div class="page-pretitle">
+                Product Management
+            </div>
+
+            <h2 class="page-title">
+                Products
+            </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+            <a
+                href="{% url 'product_create' %}"
+                class="btn btn-primary"
+            >
+                Add Product
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="card mt-3">
+
+    <div class="card-header">
+        <h3 class="card-title">
+            Product List
+        </h3>
+    </div>
+
+    <div class="table-responsive px-3 py-3">
+        <table
+            id="productTable"
+            class="table table-vcenter card-table w-100"
+        >
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>SKU</th>
+                    <th>Price</th>
+                    <th>Featured</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="w-1">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                                <img
+                                    src="{{ product.image.url }}"
+                                    alt="{{ product.name }}"
+                                    class="rounded border"
+                                    style="
+                                        width: 64px;
+                                        height: 64px;
+                                        object-fit: cover;
+                                    "
+                                >
+                            {% else %}
+                                <span
+                                    class="avatar bg-secondary-lt"
+                                    style="
+                                        width: 64px;
+                                        height: 64px;
+                                    "
+                                >
+                                    {{ product.name|slice:":1"|upper }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="fw-bold">
+                                {{ product.name }}
+                            </div>
+
+                            {% if product.short_description %}
+                                <div
+                                    class="text-secondary text-truncate mt-1"
+                                    style="max-width: 300px;"
+                                >
+                                    {{ product.short_description }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="badge bg-blue-lt">
+                                {{ product.category.name }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="text-secondary font-monospace">
+                                {{ product.sku }}
+                            </span>
+                        </td>
+
+                        <td
+                            data-order="{{ product.price }}"
+                        >
+                            <span class="fw-semibold">
+                                ₹{{ product.price|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if product.featured %}
+                                <span class="badge bg-yellow-lt">
+                                    Featured
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary-lt">
+                                    Normal
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if product.status == "active" %}
+                                <span class="badge bg-green-lt">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-red-lt">
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td
+                            data-order="{{ product.created_at|date:'Y-m-d H:i:s' }}"
+                        >
+                            {{ product.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td class="text-end">
+                            {% url "product_update" product.id as edit_url %}
+                            {% url "product_toggle_status" product.id as toggle_url %}
+                            {% url "product_delete" product.id as delete_url %}
+
+                            {% include "partials/action_dropdown.html" with edit_url=edit_url toggle_url=toggle_url delete_url=delete_url item_status=product.status show_toggle=True show_delete=True %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        new DataTable("#productTable", {
+            pageLength: 10,
+
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+            order: [
+                [7, "desc"]
+            ],
+
+            columnDefs: [
+                {
+                    targets: [0, 8],
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+
+            language: {
+                search: "Search:",
+                searchPlaceholder: "Search products...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ products",
+                zeroRecords: "No matching products found",
+                emptyTable: "No products available"
+            }
+        });
+    });
+</script>
+{% endblock %}
