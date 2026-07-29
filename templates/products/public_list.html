@@ -27,123 +27,92 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
 
 
 <!-- Products -->
-<section class="section products-page">
+<section
+    class="section products-section"
+    id="products"
+>
     <div class="container">
 
-        <!-- Search -->
-        <form
-            method="get"
-            action="{% url 'public_product_list' %}"
-            class="product-search-form"
-        >
-            {% if selected_category %}
-                <input
-                    type="hidden"
-                    name="category"
-                    value="{{ selected_category }}"
-                >
-            {% endif %}
+        <div class="section-header">
 
-            <input
-                type="search"
-                name="search"
-                value="{{ search_query }}"
-                placeholder="Search products or SKU..."
-                aria-label="Search products"
-            >
+            <h2 class="section-title">
+                Freshness you can trust
+            </h2>
+
+            <p class="section-description">
+                Browse our featured agricultural products and filter them
+                by category.
+            </p>
+
+        </div>
+
+
+        <!-- Category filters -->
+        <div class="filter-buttons">
 
             <button
-                type="submit"
-                class="btn btn-primary"
-            >
-                Search
-            </button>
-
-            {% if search_query or selected_category %}
-                <a
-                    href="{% url 'public_product_list' %}"
-                    class="clear-filter-link"
-                >
-                    Clear
-                </a>
-            {% endif %}
-        </form>
-
-
-        <!-- Category Filters -->
-        <div class="filter-bar">
-
-            <a
-                href="{% url 'public_product_list' %}{% if search_query %}?search={{ search_query|urlencode }}{% endif %}"
-                class="filter-btn {% if not selected_category %}active{% endif %}"
+                type="button"
+                class="filter-btn active"
+                data-filter="all"
             >
                 All Products
-            </a>
+            </button>
 
             {% for category in categories %}
-                <a
-                    href="{% url 'public_product_list' %}?category={{ category.slug }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
-                    class="filter-btn {% if selected_category == category.slug %}active{% endif %}"
+                <button
+                    type="button"
+                    class="filter-btn"
+                    data-filter="{{ category.slug }}"
                 >
                     {{ category.name }}
-                </a>
+                </button>
             {% endfor %}
 
         </div>
 
 
-        <!-- Results -->
-        {% if search_query %}
-            <p class="product-result-text">
-                Search results for
-                <strong>“{{ search_query }}”</strong>
-            </p>
-        {% endif %}
-
-
-        <div class="grid products-grid">
+        <!-- Product grid -->
+        <div class="products-grid">
 
             {% for product in products %}
+                <article
+                    class="product-card product-card-clickable"
+                    data-category="{{ product.category.slug }}"
+                    data-url="{% url 'public_product_detail' product.slug %}"
+                    tabindex="0"
+                    role="link"
+                    aria-label="View {{ product.name }}"
+                >
+                    <div class="product-image">
 
-                <article class="product-card">
+                        {% if product.image %}
+                            <img
+                                src="{{ product.image.url }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="product-placeholder">
+                                🌿
+                            </div>
+                        {% endif %}
 
-                    <a
-                        href="{% url 'public_product_detail' product.slug %}"
-                        class="product-image-link"
-                    >
-                        <div class="product-img">
+                        {% if product.featured %}
+                            <span class="product-badge">
+                                Featured
+                            </span>
+                        {% endif %}
 
-                            {% if product.image %}
-                                <img
-                                    src="{{ product.image.url }}"
-                                    alt="{{ product.name }}"
-                                    loading="lazy"
-                                >
-                            {% else %}
-                                <div class="product-placeholder">
-                                    🌿
-                                </div>
-                            {% endif %}
+                    </div>
 
-                            {% if product.featured %}
-                                <span class="featured-badge">
-                                    Featured
-                                </span>
-                            {% endif %}
+                    <div class="product-content">
 
-                        </div>
-                    </a>
-
-                    <div class="product-body">
-
-                        <span class="tag">
+                        <span class="product-category">
                             {{ product.category.name }}
                         </span>
 
                         <h3>
-                            <a href="{% url 'public_product_detail' product.slug %}">
-                                {{ product.name }}
-                            </a>
+                            {{ product.name }}
                         </h3>
 
                         <p>
@@ -152,58 +121,156 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                             {% elif product.description %}
                                 {{ product.description|truncatechars:110 }}
                             {% else %}
-                                Fresh and responsibly sourced agricultural
-                                product.
+                                Fresh and responsibly sourced agricultural product.
                             {% endif %}
                         </p>
 
                         <div class="product-footer">
+                            <span class="availability">
+                                Available
+                            </span>
 
-                            <div class="product-price">
-                                ₹{{ product.price|floatformat:2 }}
-                            </div>
-
-                            <a
-                                href="{% url 'public_product_detail' product.slug %}"
-                                class="product-link"
-                            >
-                                View Details →
-                            </a>
-
+                            <span class="product-link">
+                                ₹{{ product.price }}
+                            </span>
                         </div>
 
                     </div>
-
                 </article>
 
             {% empty %}
-
-                <div class="product-empty-state">
-
-                    <div class="product-empty-icon">
-                        🌱
-                    </div>
-
-                    <h2>No products found</h2>
-
-                    <p>
-                        No products match the selected category or search.
-                    </p>
-
-                    <a
-                        href="{% url 'public_product_list' %}"
-                        class="btn btn-primary"
-                    >
-                        View All Products
-                    </a>
-
-                </div>
-
+                <p class="section-description">
+                    No products are currently available.
+                </p>
             {% endfor %}
 
-        </div>
+</div>
+
+
+        <!-- Pagination -->
+        {% if products.paginator.num_pages > 1 %}
+            <nav
+                class="products-pagination"
+                aria-label="Product pagination"
+            >
+                <ul class="pagination-list">
+
+                    {% if products.has_previous %}
+                        <li>
+                            <a
+                                href="?page={{ products.previous_page_number }}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
+                                class="pagination-link"
+                                aria-label="Previous page"
+                            >
+                                Previous
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <span class="pagination-link disabled">
+                                Previous
+                            </span>
+                        </li>
+                    {% endif %}
+
+
+                    {% for page_number in products.paginator.page_range %}
+
+                        {% if page_number == products.number %}
+
+                            <li>
+                                <span class="pagination-link active">
+                                    {{ page_number }}
+                                </span>
+                            </li>
+
+                        {% elif page_number >= products.number|add:"-2" and page_number <= products.number|add:"2" %}
+
+                            <li>
+                                <a
+                                    href="?page={{ page_number }}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
+                                    class="pagination-link"
+                                >
+                                    {{ page_number }}
+                                </a>
+                            </li>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    {% if products.has_next %}
+                        <li>
+                            <a
+                                href="?page={{ products.next_page_number }}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
+                                class="pagination-link"
+                                aria-label="Next page"
+                            >
+                                Next
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <span class="pagination-link disabled">
+                                Next
+                            </span>
+                        </li>
+                    {% endif %}
+
+                </ul>
+
+                <div class="pagination-summary">
+                    Page {{ products.number }}
+                    of {{ products.paginator.num_pages }}
+                </div>
+
+            </nav>
+        {% endif %}
 
     </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const productCards = document.querySelectorAll(".product-card");
+
+    filterButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const selectedCategory = button.dataset.filter;
+
+            filterButtons.forEach(function (item) {
+                item.classList.remove("active");
+            });
+
+            button.classList.add("active");
+
+            productCards.forEach(function (card) {
+                const shouldShow =
+                    selectedCategory === "all" ||
+                    card.dataset.category === selectedCategory;
+
+                card.style.display = shouldShow ? "" : "none";
+            });
+        });
+    });
+
+    document
+        .querySelectorAll(".product-card-clickable")
+        .forEach(function (card) {
+            card.addEventListener("click", function () {
+                window.location.href = card.dataset.url;
+            });
+
+            card.addEventListener("keydown", function (event) {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    window.location.href = card.dataset.url;
+                }
+            });
+        });
+});
+</script>
 
 {% endblock %}

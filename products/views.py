@@ -9,6 +9,9 @@ from .forms import ProductForm
 from .models import Product
 from .models import ProductCategory
 
+from django.core.paginator import Paginator
+
+
 def public_product_list_view(request):
     selected_category = request.GET.get(
         "category",
@@ -20,7 +23,7 @@ def public_product_list_view(request):
         "",
     ).strip()
 
-    products = (
+    products_queryset = (
         Product.objects
         .select_related("category")
         .filter(
@@ -31,23 +34,32 @@ def public_product_list_view(request):
     )
 
     if selected_category:
-        products = products.filter(
+        products_queryset = products_queryset.filter(
             category__slug=selected_category,
         )
 
     if search_query:
-        products = products.filter(
+        products_queryset = products_queryset.filter(
             Q(name__icontains=search_query)
             | Q(sku__icontains=search_query)
             | Q(short_description__icontains=search_query)
             | Q(description__icontains=search_query)
         )
 
+    paginator = Paginator(
+        products_queryset,
+        100,
+    )
+
+    page_number = request.GET.get("page")
+
+    products = paginator.get_page(
+        page_number,
+    )
+
     categories = (
         ProductCategory.objects
-        .filter(
-            status="active",
-        )
+        .filter(status="active")
         .order_by("name")
     )
 
@@ -63,6 +75,7 @@ def public_product_list_view(request):
         "products/public_list.html",
         context,
     )
+
 
 def public_product_detail_view(request, slug):
     product = get_object_or_404(

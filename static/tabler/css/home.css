@@ -4,6 +4,7 @@
     --primary-light: #b5d532;
     --accent: #e8f4d9;
     --background: #f8fbf5;
+    --white: #ffffff;
     --surface: #ffffff;
     --heading: #263326;
     --text: #647064;
@@ -239,7 +240,7 @@ button {
             rgba(16, 48, 22, 0.62) 48%,
             rgba(16, 48, 22, 0.15) 100%
         ),
-        url("https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=1800&q=85")
+        url("../img/pages/home-banner.jpg")
         center/cover;
 }
 
@@ -610,7 +611,7 @@ button {
             rgba(36, 91, 38, 0.94),
             rgba(36, 91, 38, 0.94)
         ),
-        url("https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1800&q=85")
+        url("../img/pages/stats-bg.jpg")
         center/cover fixed;
 }
 
@@ -1378,6 +1379,62 @@ button {
     }
 }
 
+.products-pagination {
+    margin-top: 48px;
+    text-align: center;
+}
+
+.pagination-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pagination-link {
+    display: inline-flex;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 14px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dfe5df;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #254d32;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.pagination-link:hover {
+    border-color: #3c7a4d;
+    background: #f1f8f2;
+    color: #245b34;
+}
+
+.pagination-link.active {
+    border-color: #2f6d3e;
+    background: #2f6d3e;
+    color: #ffffff;
+}
+
+.pagination-link.disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.pagination-summary {
+    margin-top: 14px;
+    color: #6c756e;
+    font-size: 14px;
+}
 
 /* ==============================
    Categories Page
@@ -1393,7 +1450,7 @@ button {
             rgba(20, 70, 35, 0.88),
             rgba(20, 70, 35, 0.88)
         ),
-        url("../images/category-banner.jpg")
+        url("../img/pages/stats-bg.jpg")
         center / cover no-repeat;
 }
 

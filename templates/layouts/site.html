@@ -147,7 +147,7 @@
 
                 <ul class="footer-links">
                     <li>
-                        <a href="{% url 'home' %}#about">
+                        <a href="{% url 'about' %}">
                             About Us
                         </a>
                     </li>
@@ -161,22 +161,23 @@
             </div>
 
             <div>
+
                 <h3>Explore</h3>
 
                 <ul class="footer-links">
-                    
-                        <li>
-                            <a href="{% url 'home' %}#products">
-                                Categories
-                            </a>
-                        </li>
-                    
-                        <li>
-                            <a href="{% url 'home' %}#products">
-                                Products
-                            </a>
-                        </li>
-                    
+
+                    <li>
+                        <a href="{% url 'public_category_list' %}">
+                            Categories
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'public_product_list' %}">
+                            Products
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
