@@ -2,8 +2,9 @@ from pathlib import Path
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
 
-from .models import Product
+from .models import Product, ProductPriceVariation
 
 
 class ProductForm(forms.ModelForm):
@@ -28,7 +29,6 @@ class ProductForm(forms.ModelForm):
             "description",
             "image",
             "sku",
-            "price",
             "featured",
             "status",
         ]
@@ -71,14 +71,6 @@ class ProductForm(forms.ModelForm):
                     "placeholder": "Enter product SKU",
                 }
             ),
-            "price": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "0.00",
-                    "min": "0",
-                    "step": "0.01",
-                }
-            ),
             "featured": forms.CheckboxInput(
                 attrs={
                     "class": "form-check-input",
@@ -96,7 +88,9 @@ class ProductForm(forms.ModelForm):
         name = self.cleaned_data.get("name", "").strip()
 
         if not name:
-            raise ValidationError("Product name is required.")
+            raise ValidationError(
+                "Product name is required."
+            )
 
         return name
 
@@ -105,7 +99,9 @@ class ProductForm(forms.ModelForm):
         category = self.cleaned_data.get("category")
 
         if not category:
-            raise ValidationError("Please select a category.")
+            raise ValidationError(
+                "Please select a category."
+            )
 
         return category
 
@@ -114,12 +110,18 @@ class ProductForm(forms.ModelForm):
         sku = self.cleaned_data.get("sku", "").strip()
 
         if not sku:
-            raise ValidationError("SKU is required.")
+            raise ValidationError(
+                "SKU is required."
+            )
 
-        products = Product.objects.filter(sku__iexact=sku)
+        products = Product.objects.filter(
+            sku__iexact=sku
+        )
 
         if self.instance.pk:
-            products = products.exclude(pk=self.instance.pk)
+            products = products.exclude(
+                pk=self.instance.pk
+            )
 
         if products.exists():
             raise ValidationError(
@@ -128,20 +130,6 @@ class ProductForm(forms.ModelForm):
 
         return sku
 
-    def clean_price(self):
-
-        price = self.cleaned_data.get("price")
-
-        if price is None:
-            raise ValidationError("Price is required.")
-
-        if price < 0:
-            raise ValidationError(
-                "Price must be greater than or equal to zero."
-            )
-
-        return price
-
     def clean_image(self):
 
         image = self.cleaned_data.get("image")
@@ -149,11 +137,12 @@ class ProductForm(forms.ModelForm):
         if not image:
             return image
 
-        # Skip validation when it is the existing saved image.
         if not hasattr(image, "content_type"):
             return image
 
-        extension = Path(image.name).suffix.lower()
+        extension = Path(
+            image.name
+        ).suffix.lower()
 
         if extension not in self.ALLOWED_IMAGE_EXTENSIONS:
             raise ValidationError(
@@ -177,3 +166,73 @@ class ProductForm(forms.ModelForm):
             )
 
         return image
+
+
+class ProductPriceVariationForm(
+    forms.ModelForm
+):
+
+    class Meta:
+
+        model = ProductPriceVariation
+
+        fields = [
+            "name",
+            "price",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": (
+                        "Example: A Grade, 1 KG, "
+                        "Small Size"
+                    ),
+                }
+            ),
+            "price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "0.00",
+                    "min": "0",
+                    "step": "0.01",
+                }
+            ),
+        }
+
+    def clean_name(self):
+
+        name = self.cleaned_data.get(
+            "name",
+            ""
+        ).strip()
+
+        if not name:
+            return name
+
+        return name
+
+    def clean_price(self):
+
+        price = self.cleaned_data.get(
+            "price"
+        )
+
+        if price is not None and price < 0:
+            raise ValidationError(
+                "Price cannot be negative."
+            )
+
+        return price
+
+
+ProductPriceVariationFormSet = (
+    inlineformset_factory(
+        Product,
+        ProductPriceVariation,
+        form=ProductPriceVariationForm,
+        extra=3,
+        can_delete=True,
+    )
+)

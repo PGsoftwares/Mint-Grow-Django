@@ -78,9 +78,9 @@
                     {{ product.category.name }}
                 </span>
 
-                <h1>
+                <h2>
                     {{ product.name }}
-                </h1>
+                </h2>
 
                 {% if product.short_description %}
                     <p class="product-short-description">
@@ -88,8 +88,63 @@
                     </p>
                 {% endif %}
 
-                <div class="product-detail-price">
-                    ₹{{ product.price|floatformat:2 }}
+                <div class="product-detail-price-list">
+
+                    <h3 class="mb-3">
+                        Price Options
+                    </h3>
+
+                    {% if product.price_variations.all %}
+
+                        <div class="product-price-selector">
+
+                            <label
+                                for="priceVariation"
+                                class="product-price-label"
+                            >
+                                Select Option
+                            </label>
+
+                            <select
+                                id="priceVariation"
+                                class="form-select"
+                            >
+                                {% for variation in product.price_variations.all %}
+                                    <option
+                                        value="{{ variation.price }}"
+                                    >
+                                        {{ variation.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+
+                            <div class="selected-product-price mt-3">
+
+                                <span class="price-caption">
+                                    Price
+                                </span>
+
+                                <strong id="selectedPrice">
+                                    {% with first_price=product.price_variations.first %}
+                                        {% if first_price %}
+                                            ₹{{ first_price.price|floatformat:2 }}
+                                        {% endif %}
+                                    {% endwith %}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-secondary">
+                            Price not available.
+                        </div>
+
+                    {% endif %}
+
                 </div>
 
                 <div class="product-meta">
@@ -259,5 +314,37 @@
         </div>
     </section>
 {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const variationSelect = document.getElementById(
+        "priceVariation"
+    );
+
+    const selectedPrice = document.getElementById(
+        "selectedPrice"
+    );
+
+    if (!variationSelect || !selectedPrice) {
+        return;
+    }
+
+    variationSelect.addEventListener(
+        "change",
+        function () {
+
+            const price = parseFloat(
+                this.value
+            );
+
+            selectedPrice.textContent =
+                "₹" + price.toFixed(2);
+
+        }
+    );
+
+});
+</script>
 
 {% endblock %}

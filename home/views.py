@@ -1,12 +1,13 @@
 from django.shortcuts import render
 
-from django.shortcuts import render
+from django.db.models import Min, Max
 
 from categories.models import ProductCategory
 from products.models import Product
 
 
 def home_view(request):
+
     categories = (
         ProductCategory.objects
         .filter(
@@ -24,6 +25,10 @@ def home_view(request):
             category__status="active",
         )
         .select_related("category")
+        .annotate(
+            min_price=Min("price_variations__price"),
+            max_price=Max("price_variations__price"),
+        )
         .order_by("-created_at")[:8]
     )
 

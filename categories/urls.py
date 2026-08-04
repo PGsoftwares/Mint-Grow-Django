@@ -6,6 +6,12 @@ from . import views
 urlpatterns = [
     
     path(
+        "<slug:slug>/products/",
+        views.public_category_products_view,
+        name="public_category_products",
+    ),
+        
+    path(
         "all/",
         views.public_category_list_view,
         name="public_category_list",

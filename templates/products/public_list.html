@@ -15,7 +15,7 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
 <section class="page-banner">
     <div class="container">
 
-        <h1>Our Products</h1>
+        <h1>Our Products</h1> 
 
         <p>
             Explore fresh, traceable and responsibly sourced agricultural
@@ -47,104 +47,162 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
         </div>
 
 
-        <!-- Category filters -->
-        <div class="filter-buttons">
+        <div class="products-layout">
 
-            <button
-                type="button"
-                class="filter-btn active"
-                data-filter="all"
-            >
-                All Products
-            </button>
+            <!-- Category Sidebar -->
+            <aside class="products-sidebar">
 
-            {% for category in categories %}
-                <button
-                    type="button"
-                    class="filter-btn"
-                    data-filter="{{ category.slug }}"
-                >
-                    {{ category.name }}
-                </button>
-            {% endfor %}
+                <div class="filter-buttons">
 
-        </div>
+                    <a
+                        href="{% url 'public_product_list' %}"
+                        class="filter-btn {% if not selected_category %}active{% endif %}"
+                    >
+                        All Products
+                    </a>
+
+                    {% for category in categories %}
+
+                        <a
+                            href="?category={{ category.slug }}"
+                            class="filter-btn {% if selected_category == category.slug %}active{% endif %}"
+                        >
+                            {{ category.name }}
+                        </a>
+
+                    {% endfor %}
+
+                </div>
+
+            </aside>
 
 
-        <!-- Product grid -->
-        <div class="products-grid">
+            <!-- Products -->
+            <div class="products-main">
 
-            {% for product in products %}
-                <article
-                    class="product-card product-card-clickable"
-                    data-category="{{ product.category.slug }}"
-                    data-url="{% url 'public_product_detail' product.slug %}"
-                    tabindex="0"
-                    role="link"
-                    aria-label="View {{ product.name }}"
-                >
-                    <div class="product-image">
+                <div class="products-grid">
 
-                        {% if product.image %}
-                            <img
-                                src="{{ product.image.url }}"
-                                alt="{{ product.name }}"
-                                loading="lazy"
-                            >
-                        {% else %}
-                            <div class="product-placeholder">
-                                🌿
+                    {% for product in products %}
+
+                        <a
+                            href="{% url 'public_product_detail' product.slug %}"
+                            class="product-card product-card-clickable"
+                            aria-label="View {{ product.name }}"
+                        >
+
+                            <div class="product-image">
+
+                                {% if product.image %}
+
+                                    <img
+                                        src="{{ product.image.url }}"
+                                        alt="{{ product.name }}"
+                                        loading="lazy"
+                                    >
+
+                                {% else %}
+
+                                    <div class="product-placeholder">
+                                        🌿
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if product.featured %}
+
+                                    <span class="product-badge">
+                                        Featured
+                                    </span>
+
+                                {% endif %}
+
                             </div>
-                        {% endif %}
 
-                        {% if product.featured %}
-                            <span class="product-badge">
-                                Featured
-                            </span>
-                        {% endif %}
 
-                    </div>
+                            <div class="product-content">
 
-                    <div class="product-content">
+                                <span class="product-category">
+                                    {{ product.category.name }}
+                                </span>
 
-                        <span class="product-category">
-                            {{ product.category.name }}
-                        </span>
+                                <h3>
+                                    {{ product.name }}
+                                </h3>
 
-                        <h3>
-                            {{ product.name }}
-                        </h3>
+                                <p>
+                                    {% if product.short_description %}
 
-                        <p>
-                            {% if product.short_description %}
-                                {{ product.short_description|truncatechars:110 }}
-                            {% elif product.description %}
-                                {{ product.description|truncatechars:110 }}
-                            {% else %}
-                                Fresh and responsibly sourced agricultural product.
-                            {% endif %}
+                                        {{ product.short_description|truncatechars:110 }}
+
+                                    {% elif product.description %}
+
+                                        {{ product.description|truncatechars:110 }}
+
+                                    {% else %}
+
+                                        Fresh and responsibly sourced agricultural product.
+
+                                    {% endif %}
+                                </p>
+
+
+                                <div class="product-footer">
+
+                                    <span class="availability">
+                                        Available
+                                    </span>
+
+
+                                    <div class="product-price-range">
+
+                                        {% if product.min_price is not None %}
+
+                                            {% if product.min_price == product.max_price %}
+
+                                                <span class="product-price-value">
+                                                    ₹{{ product.min_price|floatformat:2 }}
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="product-price-value">
+                                                    ₹{{ product.min_price|floatformat:2 }}
+                                                    -
+                                                    ₹{{ product.max_price|floatformat:2 }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        {% else %}
+
+                                            <span class="text-secondary">
+                                                Price not available
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    {% empty %}
+
+                        <p class="section-description">
+                            No products are currently available.
                         </p>
 
-                        <div class="product-footer">
-                            <span class="availability">
-                                Available
-                            </span>
+                    {% endfor %}
 
-                            <span class="product-link">
-                                ₹{{ product.price }}
-                            </span>
-                        </div>
+                </div>
 
-                    </div>
-                </article>
+            </div>
 
-            {% empty %}
-                <p class="section-description">
-                    No products are currently available.
-                </p>
-            {% endfor %}
-
-</div>
+        </div>
 
 
         <!-- Pagination -->
@@ -256,20 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    document
-        .querySelectorAll(".product-card-clickable")
-        .forEach(function (card) {
-            card.addEventListener("click", function () {
-                window.location.href = card.dataset.url;
-            });
-
-            card.addEventListener("keydown", function (event) {
-                if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    window.location.href = card.dataset.url;
-                }
-            });
-        });
+    
 });
 </script>
 

@@ -1,0 +1,255 @@
+{% extends "layouts/site.html" %}
+{% load static %}
+
+{% block title %}
+{{ category.name }} Products | Mint Grow Farm
+{% endblock %}
+
+{% block meta_description %}
+Explore {{ category.name }} products from Mint Grow Farm.
+{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container">
+
+        <h1>
+            {{ category.name }}
+        </h1>
+
+        <p>
+            Explore fresh and responsibly sourced
+            {{ category.name|lower }} products.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="section products-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <h2 class="section-title">
+                {{ category.name }} Products
+            </h2>
+
+            {% if category.description %}
+                <p class="section-description">
+                    {{ category.description }}
+                </p>
+            {% endif %}
+
+        </div>
+
+
+        <div class="products-grid">
+
+            {% for product in products %}
+
+                <article
+                    class="product-card product-card-clickable"
+                    data-url="{% url 'public_product_detail' product.slug %}"
+                    tabindex="0"
+                    role="link"
+                    aria-label="View {{ product.name }}"
+                >
+
+                    <div class="product-image">
+
+                        {% if product.image %}
+
+                            <img
+                                src="{{ product.image.url }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                            >
+
+                        {% else %}
+
+                            <div class="product-placeholder">
+                                🌿
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if product.featured %}
+
+                            <span class="product-badge">
+                                Featured
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="product-content">
+
+                        <span class="product-category">
+                            {{ product.category.name }}
+                        </span>
+
+
+                        <h3>
+                            {{ product.name }}
+                        </h3>
+
+
+                        <p>
+
+                            {% if product.short_description %}
+
+                                {{ product.short_description|truncatechars:110 }}
+
+                            {% elif product.description %}
+
+                                {{ product.description|truncatechars:110 }}
+
+                            {% else %}
+
+                                Fresh and responsibly sourced agricultural product.
+
+                            {% endif %}
+
+                        </p>
+
+
+                        <div class="product-footer">
+
+                            <span class="availability">
+                                Available
+                            </span>
+
+
+                            <div class="product-price-range">
+
+                                {% if product.min_price is not None %}
+
+                                    {% if product.min_price == product.max_price %}
+
+                                        <span class="product-price-value">
+                                            ₹{{ product.min_price|floatformat:2 }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="product-price-value">
+                                            ₹{{ product.min_price|floatformat:2 }}
+                                            -
+                                            ₹{{ product.max_price|floatformat:2 }}
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="text-secondary">
+                                        Price not available
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <div class="w-100 text-center py-5">
+
+                    <h3>
+                        No products available
+                    </h3>
+
+                    <p class="text-secondary">
+                        There are currently no active products in this category.
+                    </p>
+
+                    <a
+                        href="{% url 'public_product_list' %}"
+                        class="primary-btn"
+                    >
+                        View All Products
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="text-center mt-5">
+
+            <a
+                href="{% url 'public_category_list' %}"
+                class="secondary-btn"
+            >
+                Back to Categories
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document
+        .querySelectorAll(".product-card-clickable")
+        .forEach(function (card) {
+
+            card.addEventListener(
+                "click",
+                function () {
+
+                    const url = card.dataset.url;
+
+                    if (url) {
+                        window.location.href = url;
+                    }
+
+                }
+            );
+
+
+            card.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                    ) {
+
+                        event.preventDefault();
+
+                        const url = card.dataset.url;
+
+                        if (url) {
+                            window.location.href = url;
+                        }
+
+                    }
+
+                }
+            );
+
+        });
+
+});
+</script>
+
+{% endblock %}

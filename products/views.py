@@ -1,15 +1,13 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
-from django.db.models import Q
+from django.db.models import Q, Min, Max
+from django.core.paginator import Paginator
 
 from accounts.decorators import admin_required
 
-from .forms import ProductForm
-from .models import Product
-from .models import ProductCategory
-
-from django.core.paginator import Paginator
+from .forms import ProductForm, ProductPriceVariationFormSet
+from .models import Product, ProductCategory
 
 
 def public_product_list_view(request):
@@ -30,6 +28,10 @@ def public_product_list_view(request):
             status="active",
             category__status="active",
         )
+        .annotate(
+            min_price=Min("price_variations__price"),
+            max_price=Max("price_variations__price"),
+        )
         .order_by("-created_at")
     )
 
@@ -48,7 +50,7 @@ def public_product_list_view(request):
 
     paginator = Paginator(
         products_queryset,
-        100,
+        12,
     )
 
     page_number = request.GET.get("page")
@@ -107,12 +109,19 @@ def public_product_detail_view(request, slug):
         context,
     )
     
+
 @admin_required
 def product_list_view(request):
 
-    products = Product.objects.select_related(
-        "category"
-    ).order_by("-created_at")
+    products = (
+        Product.objects
+        .select_related("category")
+        .annotate(
+            min_price=Min("price_variations__price"),
+            max_price=Max("price_variations__price"),
+        )
+        .order_by("-created_at")
+    )
 
     return render(
         request,
@@ -131,17 +140,32 @@ def product_create_view(request):
         request.FILES or None,
     )
 
+    price_formset = ProductPriceVariationFormSet(
+        request.POST or None,
+        prefix="price_variations",
+    )
+
     if request.method == "POST":
 
-        if form.is_valid():
+        if form.is_valid() and price_formset.is_valid():
+
             product = form.save()
 
-            messages.success(
-                request,
-                f"{product.name} created successfully!",
+            price_formset = ProductPriceVariationFormSet(
+                request.POST,
+                instance=product,
+                prefix="price_variations",
             )
 
-            return redirect("product_list")
+            if price_formset.is_valid():
+                price_formset.save()
+
+                messages.success(
+                    request,
+                    f"{product.name} created successfully!",
+                )
+
+                return redirect("product_list")
 
         messages.error(
             request,
@@ -153,10 +177,12 @@ def product_create_view(request):
         "products/create.html",
         {
             "form": form,
+            "price_formset": price_formset,
         },
     )
 
 
+@admin_required
 @admin_required
 def product_update_view(request, id):
 
@@ -173,11 +199,19 @@ def product_update_view(request, id):
         instance=product,
     )
 
+    price_formset = ProductPriceVariationFormSet(
+        request.POST or None,
+        instance=product,
+        prefix="price_variations",
+    )
+
     if request.method == "POST":
 
-        if form.is_valid():
+        if form.is_valid() and price_formset.is_valid():
 
             product = form.save()
+
+            price_formset.save()
 
             if (
                 old_image
@@ -203,6 +237,7 @@ def product_update_view(request, id):
         "products/update.html",
         {
             "form": form,
+            "price_formset": price_formset,
             "product": product,
         },
     )

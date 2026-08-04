@@ -4,7 +4,9 @@
         <label class="form-label">
             Category <span class="text-danger">*</span>
         </label>
+
         {{ form.category }}
+
         {% if form.category.errors %}
             <div class="text-danger small mt-1">
                 {{ form.category.errors.0 }}
@@ -12,11 +14,14 @@
         {% endif %}
     </div>
 
+
     <div class="col-md-6 mb-3">
         <label class="form-label">
             Product Name <span class="text-danger">*</span>
         </label>
+
         {{ form.name }}
+
         {% if form.name.errors %}
             <div class="text-danger small mt-1">
                 {{ form.name.errors.0 }}
@@ -24,11 +29,14 @@
         {% endif %}
     </div>
 
+
     <div class="col-md-6 mb-3">
         <label class="form-label">
             SKU <span class="text-danger">*</span>
         </label>
+
         {{ form.sku }}
+
         {% if form.sku.errors %}
             <div class="text-danger small mt-1">
                 {{ form.sku.errors.0 }}
@@ -36,19 +44,9 @@
         {% endif %}
     </div>
 
-    <div class="col-md-6 mb-3">
-        <label class="form-label">
-            Price <span class="text-danger">*</span>
-        </label>
-        {{ form.price }}
-        {% if form.price.errors %}
-            <div class="text-danger small mt-1">
-                {{ form.price.errors.0 }}
-            </div>
-        {% endif %}
-    </div>
 
     <div class="col-12 mb-3">
+
         <label class="form-label">
             Product Image
         </label>
@@ -57,12 +55,14 @@
 
         {% if product and product.image %}
             <div class="mt-3">
+
                 <img
                     src="{{ product.image.url }}"
                     class="img-thumbnail"
                     width="150"
                     alt="{{ product.name }}"
                 >
+
             </div>
         {% endif %}
 
@@ -71,51 +71,244 @@
                 {{ form.image.errors.0 }}
             </div>
         {% endif %}
+
     </div>
 
+
     <div class="col-12 mb-3">
+
         <label class="form-label">
             Short Description
         </label>
+
         {{ form.short_description }}
+
         {% if form.short_description.errors %}
             <div class="text-danger small mt-1">
                 {{ form.short_description.errors.0 }}
             </div>
         {% endif %}
+
     </div>
 
+
     <div class="col-12 mb-3">
+
         <label class="form-label">
             Description
         </label>
+
         {{ form.description }}
+
         {% if form.description.errors %}
             <div class="text-danger small mt-1">
                 {{ form.description.errors.0 }}
             </div>
         {% endif %}
+
     </div>
 
+
     <div class="col-md-6 mb-3">
+
         <div class="form-check form-switch mt-4">
+
             {{ form.featured }}
-            <label class="form-check-label" for="{{ form.featured.id_for_label }}">
+
+            <label
+                class="form-check-label"
+                for="{{ form.featured.id_for_label }}"
+            >
                 Featured Product
             </label>
+
         </div>
+
     </div>
 
+
     <div class="col-md-6 mb-3">
+
         <label class="form-label">
             Status
         </label>
+
         {{ form.status }}
+
         {% if form.status.errors %}
             <div class="text-danger small mt-1">
                 {{ form.status.errors.0 }}
             </div>
         {% endif %}
+
     </div>
 
 </div>
+
+
+<hr class="my-4">
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+
+    <div>
+        <h3 class="card-title mb-1">
+            Price Variations
+        </h3>
+
+        <div class="text-secondary">
+            Add grade, size, weight or quantity-based prices.
+        </div>
+    </div>
+
+    <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        id="add-price-row"
+    >
+        + Add Price
+    </button>
+
+</div>
+
+
+{{ price_formset.management_form }}
+
+{% if price_formset.non_form_errors %}
+    <div class="alert alert-danger">
+        {{ price_formset.non_form_errors }}
+    </div>
+{% endif %}
+
+
+<div class="table-responsive">
+
+    <table class="table table-vcenter">
+
+        <thead>
+            <tr>
+                <th>
+                    Grade / Size / Quantity
+                </th>
+
+                <th style="width: 220px;">
+                    Price
+                </th>
+
+                <th style="width: 100px;">
+                    Action
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="price-formset-body">
+
+            {% for price_form in price_formset %}
+
+                <tr class="price-form-row">
+
+                    <td>
+
+                        {{ price_form.id }}
+
+                        {{ price_form.name }}
+
+                        {% if price_form.name.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ price_form.name.errors.0 }}
+                            </div>
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                ₹
+                            </span>
+
+                            {{ price_form.price }}
+
+                        </div>
+
+                        {% if price_form.price.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ price_form.price.errors.0 }}
+                            </div>
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="text-center">
+
+                        <div class="d-none">
+                            {{ price_form.DELETE }}
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-danger btn-sm remove-price-row"
+                        >
+                            ×
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<template id="empty-price-form-template">
+
+    <tr class="price-form-row">
+
+        <td>
+
+            {{ price_formset.empty_form.id }}
+
+            {{ price_formset.empty_form.name }}
+
+        </td>
+
+        <td>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    ₹
+                </span>
+
+                {{ price_formset.empty_form.price }}
+
+            </div>
+
+        </td>
+
+        <td class="text-center">
+
+            <div class="d-none">
+                {{ price_formset.empty_form.DELETE }}
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-outline-danger btn-sm remove-price-row"
+            >
+                ×
+            </button>
+
+        </td>
+
+    </tr>
+
+</template>

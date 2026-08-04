@@ -7,9 +7,11 @@
 {% block content %}
 
 <div class="page-header d-print-none">
+
     <div class="row g-2 align-items-center">
 
         <div class="col">
+
             <div class="page-pretitle">
                 Product Management
             </div>
@@ -17,39 +19,58 @@
             <h2 class="page-title">
                 Create Product
             </h2>
+
         </div>
 
+
         <div class="col-auto ms-auto">
-            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+
+            <a
+                href="{% url 'product_list' %}"
+                class="btn btn-outline-secondary"
+            >
                 Back to Products
             </a>
+
         </div>
 
     </div>
+
 </div>
+
 
 <div class="card mt-3">
 
     <div class="card-header">
+
         <h3 class="card-title">
             Product Details
         </h3>
+
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
         {% csrf_token %}
 
         <div class="card-body">
 
             {% if form.non_field_errors %}
+
                 <div class="alert alert-danger">
                     {{ form.non_field_errors }}
                 </div>
+
             {% endif %}
 
             {% include "products/form.html" %}
 
         </div>
+
 
         <div class="card-footer text-end">
 
@@ -60,13 +81,138 @@
                 Cancel
             </a>
 
-            <button type="submit" class="btn btn-primary">
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
                 Create Product
             </button>
 
         </div>
+
     </form>
 
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addButton = document.getElementById("add-price-row");
+    const tableBody = document.getElementById("price-formset-body");
+    const template = document.getElementById("empty-price-form-template");
+
+    if (!addButton || !tableBody || !template) {
+        console.error("Price variation elements are missing.");
+        return;
+    }
+
+    const totalForms = document.querySelector(
+        'input[name$="-TOTAL_FORMS"]'
+    );
+
+    if (!totalForms) {
+        console.error("TOTAL_FORMS input not found.");
+        return;
+    }
+
+    const prefix = totalForms.name.replace(
+        "-TOTAL_FORMS",
+        ""
+    );
+
+
+    function bindRemoveButton(button) {
+
+        button.addEventListener("click", function () {
+
+            const row = button.closest(".price-form-row");
+
+            if (!row) {
+                return;
+            }
+
+            const idInput = row.querySelector(
+                'input[name$="-id"]'
+            );
+
+            const deleteInput = row.querySelector(
+                'input[name$="-DELETE"]'
+            );
+
+            // Existing saved row
+            if (
+                idInput &&
+                idInput.value &&
+                deleteInput
+            ) {
+                deleteInput.checked = true;
+                row.style.display = "none";
+                return;
+            }
+
+            // New unsaved row
+            row.remove();
+        });
+    }
+
+
+    addButton.addEventListener("click", function () {
+
+        const formIndex = parseInt(
+            totalForms.value,
+            10
+        );
+
+        let newFormHtml = template.innerHTML;
+
+        newFormHtml = newFormHtml.replaceAll(
+            "__prefix__",
+            formIndex
+        );
+
+        tableBody.insertAdjacentHTML(
+            "beforeend",
+            newFormHtml
+        );
+
+        totalForms.value = formIndex + 1;
+
+        const newRow = tableBody.lastElementChild;
+
+        if (!newRow) {
+            return;
+        }
+
+        const removeButton = newRow.querySelector(
+            ".remove-price-row"
+        );
+
+        if (removeButton) {
+            bindRemoveButton(removeButton);
+        }
+
+        const nameInput = newRow.querySelector(
+            `input[name="${prefix}-${formIndex}-name"]`
+        );
+
+        if (nameInput) {
+            nameInput.focus();
+        }
+
+    });
+
+
+    document
+        .querySelectorAll(".remove-price-row")
+        .forEach(function (button) {
+            bindRemoveButton(button);
+        });
+
+});
+</script>
 
 {% endblock %}

@@ -64,48 +64,84 @@
             </p>
         </div>
 
+        <!-- Categories -->
+
+
         <div class="categories-grid">
 
             {% for category in categories %}
+
                 <a
-                    href="#products"
+                    href="{% url 'public_category_list' %}?category={{ category.slug }}"
                     class="category-card"
-                    data-category-link="{{ category.slug }}"
                 >
-                    <div class="category-icon">
+
+                    <div class="category-image">
 
                         {% if category.image %}
+
                             <img
                                 src="{{ category.image.url }}"
                                 alt="{{ category.name }}"
-                                loading="lazy"
+                                loading="lazy" 
                             >
+
                         {% else %}
-                            🌿
+
+                            <div class="category-placeholder">
+                                🌿
+                            </div>
+
                         {% endif %}
 
                     </div>
 
-                    <h3>
-                        {{ category.name }}
-                    </h3>
+                    <div class="category-content">
+
+                        <h3>
+                            {{ category.name }}
+                        </h3>
+
+                        <p>
+                            {% if category.description %}
+                                {{ category.description|truncatechars:130 }}
+                            {% else %}
+                                Explore fresh and responsibly sourced
+                                {{ category.name|lower }} products.
+                            {% endif %}
+                        </p>
+<!-- 
+                        <span class="category-link">
+                            View Products
+                            <span aria-hidden="true">→</span>
+                        </span> -->
+
+                    </div>
+
+                </a>
+
+            {% empty %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state-icon">
+                        🌿
+                    </div>
+
+                    <h2>No categories available</h2>
 
                     <p>
-                        {% if category.description %}
-                            {{ category.description|truncatechars:80 }}
-                        {% else %}
-                            Explore our {{ category.name|lower }} products.
-                        {% endif %}
+                        Product categories will appear here once they are added.
                     </p>
-                </a>
-            {% empty %}
-                <p class="section-description">
-                    No categories are currently available.
-                </p>
+
+                </div>
+
             {% endfor %}
 
         </div>
+
     </div>
+    
 </section>
 
 <section
@@ -154,9 +190,10 @@
         <div class="products-grid">
 
             {% for product in featured_products %}
-                <article
-                    class="product-card"
-                    data-category="{{ product.category.slug }}"
+                <a
+                    href="{% url 'public_product_detail' product.slug %}"
+                    class="product-card product-card-clickable"
+                    aria-label="View {{ product.name }}"
                 >
                     <div class="product-image">
 
@@ -204,12 +241,38 @@
                                 Available
                             </span>
 
-                            <span class="product-link">
-                                ₹{{ product.price }}
-                            </span>
+                            <div class="product-price-range">
+
+                                {% if product.min_price is not None %}
+
+                                    {% if product.min_price == product.max_price %}
+
+                                        <span class="product-price-value">
+                                            ₹{{ product.min_price|floatformat:2 }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="product-price-value">
+                                            ₹{{ product.min_price|floatformat:2 }}
+                                            -
+                                            ₹{{ product.max_price|floatformat:2 }}
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="text-secondary">
+                                        Price not available
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
                         </div>
                     </div>
-                </article>
+                </a>
             {% empty %}
                 <p class="section-description">
                     No featured products are currently available.

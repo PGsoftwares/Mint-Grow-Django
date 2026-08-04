@@ -7,6 +7,10 @@ from accounts.decorators import admin_required
 from .forms import ProductCategoryForm
 from .models import ProductCategory
 
+from products.models import Product
+
+from django.db.models import Min, Max
+
 
 def public_category_list_view(request):
     categories = (
@@ -26,7 +30,50 @@ def public_category_list_view(request):
             "categories": categories,
         },
     )
-    
+
+def public_category_products_view(request, slug):
+
+    category = get_object_or_404(
+        ProductCategory,
+        slug=slug,
+        status="active",
+    )
+
+    category_ids = [category.id]
+
+    if category.children.exists():
+        category_ids.extend(
+            category.children.filter(
+                status="active"
+            ).values_list(
+                "id",
+                flat=True,
+            )
+        )
+
+    products = (
+        Product.objects
+        .select_related("category")
+        .filter(
+            category_id__in=category_ids,
+            status="active",
+        )
+        .annotate(
+            min_price=Min("price_variations__price"),
+            max_price=Max("price_variations__price"),
+        )
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "categories/public_products.html",
+        {
+            "category": category,
+            "products": products,
+        },
+    )
+      
 @admin_required
 def category_list_view(request):
     categories = (

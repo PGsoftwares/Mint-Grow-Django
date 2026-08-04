@@ -93,7 +93,7 @@
                             {% if product.short_description %}
                                 <div
                                     class="text-secondary text-truncate mt-1"
-                                    style="max-width: 300px;"
+                                    style="max-width: 200px;"
                                 >
                                     {{ product.short_description }}
                                 </div>
@@ -113,11 +113,33 @@
                         </td>
 
                         <td
-                            data-order="{{ product.price }}"
+                            data-order="{{ product.min_price|default:0 }}"
                         >
-                            <span class="fw-semibold">
-                                ₹{{ product.price|floatformat:2 }}
-                            </span>
+                            {% if product.min_price is not None %}
+
+                                {% if product.min_price == product.max_price %}
+
+                                    <span class="fw-semibold">
+                                        ₹{{ product.min_price|floatformat:2 }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="fw-semibold">
+                                        ₹{{ product.min_price|floatformat:2 }}
+                                        -
+                                        ₹{{ product.max_price|floatformat:2 }}
+                                    </span>
+
+                                {% endif %}
+
+                            {% else %}
+
+                                <span class="text-secondary">
+                                    No price
+                                </span>
+
+                            {% endif %}
                         </td>
 
                         <td>
