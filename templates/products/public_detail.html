@@ -111,7 +111,8 @@
                             >
                                 {% for variation in product.price_variations.all %}
                                     <option
-                                        value="{{ variation.price }}"
+                                        value="{{ variation.id }}"
+                                        data-price="{{ variation.price }}"
                                     >
                                         {{ variation.name }}
                                     </option>
@@ -177,23 +178,64 @@
 
                 </div>
 
-                <div class="product-actions">
+                {% if product.price_variations.all %}
 
-                    <a
-                        href="{% url 'contact' %}?product={{ product.name|urlencode }}"
-                        class="btn btn-primary"
+                    <form
+                        action="{% url 'cart_add' product.id %}"
+                        method="post"
+                        class="product-cart-form"
                     >
-                        Send Enquiry
-                    </a>
 
-                    <a
-                        href="{% url 'public_product_list' %}"
-                        class="btn product-back-btn"
-                    >
-                        Back to Products
-                    </a>
+                        {% csrf_token %}
 
-                </div>
+                        <input
+                            type="hidden"
+                            name="variation_id"
+                            id="cartVariationId"
+                            value="{{ product.price_variations.first.id }}"
+                        >
+
+                        <div class="product-quantity">
+
+                            <label
+                                for="quantity"
+                                class="product-price-label"
+                            >
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                name="quantity"
+                                id="quantity"
+                                class="form-control"
+                                value="1"
+                                min="1"
+                            >
+
+                        </div>
+
+                        <div class="product-actions">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                Add to Cart
+                            </button>
+
+                            <a
+                                href="{% url 'cart_detail' %}"
+                                class="btn product-back-btn"
+                            >
+                                View Cart
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                {% endif %}
 
             </div>
 
@@ -316,35 +358,68 @@
 {% endif %}
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    const variationSelect = document.getElementById(
-        "priceVariation"
-    );
-
-    const selectedPrice = document.getElementById(
-        "selectedPrice"
-    );
-
-    if (!variationSelect || !selectedPrice) {
-        return;
-    }
-
-    variationSelect.addEventListener(
-        "change",
-        function () {
-
-            const price = parseFloat(
-                this.value
+        const variationSelect =
+            document.getElementById(
+                "priceVariation"
             );
+
+        const selectedPrice =
+            document.getElementById(
+                "selectedPrice"
+            );
+
+        const cartVariationId =
+            document.getElementById(
+                "cartVariationId"
+            );
+
+        if (
+            !variationSelect ||
+            !selectedPrice
+        ) {
+            return;
+        }
+
+
+        function updateVariation() {
+
+            const selectedOption =
+                variationSelect.options[
+                    variationSelect.selectedIndex
+                ];
+
+            const price =
+                parseFloat(
+                    selectedOption.dataset.price
+                );
 
             selectedPrice.textContent =
                 "₹" + price.toFixed(2);
 
-        }
-    );
+            if (cartVariationId) {
 
-});
+                cartVariationId.value =
+                    selectedOption.value;
+
+            }
+
+        }
+
+
+        variationSelect.addEventListener(
+            "change",
+            updateVariation
+        );
+
+
+        updateVariation();
+
+    }
+);
 </script>
 
 {% endblock %}

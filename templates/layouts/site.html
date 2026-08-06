@@ -65,6 +65,21 @@
                 </li>
 
                 <li>
+                    <a
+                        href="{% url 'cart_detail' %}"
+                        class="cart-nav-link"
+                    >
+                        Cart
+
+                        {% if cart_count %}
+                            <span class="cart-count">
+                                {{ cart_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+                </li>
+
+                <li>
                     <a href="{% url 'contact' %}">
                         Contact
                     </a>

@@ -1,0 +1,227 @@
+{% extends "layouts/site.html" %}
+
+{% block title %}
+Checkout | Mint Grow Farm
+{% endblock %}
+
+{% block content %}
+
+<section class="section checkout-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <h1>
+                Checkout
+            </h1>
+
+            <p>
+                Enter your delivery information.
+            </p>
+
+        </div>
+
+
+        <div class="checkout-layout">
+
+
+            <!-- Billing / Delivery -->
+
+            <div class="checkout-form-card">
+
+                <h3>
+                    Delivery Details
+                </h3>
+
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Name
+                            </label>
+
+                            {{ form.name }}
+
+                            {{ form.name.errors }}
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Phone
+                            </label>
+
+                            {{ form.phone }}
+
+                            {{ form.phone.errors }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        {{ form.email }}
+
+                        {{ form.email.errors }}
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Delivery Address
+                        </label>
+
+                        {{ form.address }}
+
+                        {{ form.address.errors }}
+
+                    </div>
+
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                City
+                            </label>
+
+                            {{ form.city }}
+
+                        </div>
+
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                State
+                            </label>
+
+                            {{ form.state }}
+
+                        </div>
+
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                Pincode
+                            </label>
+
+                            {{ form.pincode }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Order Notes
+                        </label>
+
+                        {{ form.notes }}
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <label class="form-label">
+                            Payment Method
+                        </label>
+
+                        {{ form.payment_method }}
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+                        Place Order
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- Order Summary -->
+
+            <div class="checkout-summary">
+
+                <h3>
+                    Your Order
+                </h3>
+
+
+                {% for item in cart_items %}
+
+                    <div class="checkout-product">
+
+                        <div>
+
+                            <strong>
+                                {{ item.product.name }}
+                            </strong>
+
+                            <small>
+                                {{ item.variation.name }}
+                                ×
+                                {{ item.quantity }}
+                            </small>
+
+                        </div>
+
+
+                        <strong>
+                            ₹{{ item.total|floatformat:2 }}
+                        </strong>
+
+                    </div>
+
+                {% endfor %}
+
+
+                <div class="checkout-total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong>
+                        ₹{{ cart_total|floatformat:2 }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
