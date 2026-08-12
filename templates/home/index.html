@@ -1,4 +1,5 @@
 {% extends "layouts/site.html" %}
+
 {% load static %}
 
 {% block title %}
@@ -34,7 +35,7 @@
                     View Our Products
                 </a>
 
-                <a href="#about" class="secondary-btn">
+                <a href="{% url 'about' %}" class="secondary-btn">
                     Discover Our Story
                 </a>
             </div>
@@ -43,106 +44,6 @@
     </div>
 </section>
 
-<section
-    class="section categories-section"
-    id="categories"
->
-    <div class="container">
-
-        <div class="section-header">
-            <span class="eyebrow">
-                Our Categories
-            </span>
-
-            <h2 class="section-title">
-                Explore our product range
-            </h2>
-
-            <p class="section-description">
-                Discover carefully sourced and professionally managed
-                agricultural products.
-            </p>
-        </div>
-
-        <!-- Categories -->
-
-
-        <div class="categories-grid">
-
-            {% for category in categories %}
-
-                <a
-                    href="{% url 'public_category_list' %}?category={{ category.slug }}"
-                    class="category-card"
-                >
-
-                    <div class="category-image">
-
-                        {% if category.image %}
-
-                            <img
-                                src="{{ category.image.url }}"
-                                alt="{{ category.name }}"
-                                loading="lazy" 
-                            >
-
-                        {% else %}
-
-                            <div class="category-placeholder">
-                                🌿
-                            </div>
-
-                        {% endif %}
-
-                    </div>
-
-                    <div class="category-content">
-
-                        <h3>
-                            {{ category.name }}
-                        </h3>
-
-                        <p>
-                            {% if category.description %}
-                                {{ category.description|truncatechars:130 }}
-                            {% else %}
-                                Explore fresh and responsibly sourced
-                                {{ category.name|lower }} products.
-                            {% endif %}
-                        </p>
-<!-- 
-                        <span class="category-link">
-                            View Products
-                            <span aria-hidden="true">→</span>
-                        </span> -->
-
-                    </div>
-
-                </a>
-
-            {% empty %}
-
-                <div class="empty-state">
-
-                    <div class="empty-state-icon">
-                        🌿
-                    </div>
-
-                    <h2>No categories available</h2>
-
-                    <p>
-                        Product categories will appear here once they are added.
-                    </p>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-    </div>
-    
-</section>
 
 <section
     class="section products-section"
@@ -151,8 +52,9 @@
     <div class="container">
 
         <div class="section-header">
+
             <span class="eyebrow">
-                Featured Products
+                Our Products
             </span>
 
             <h2 class="section-title">
@@ -160,326 +62,323 @@
             </h2>
 
             <p class="section-description">
-                Browse our featured agricultural products and filter them
-                by category.
+                Search, sort and select your preferred product variation.
             </p>
+
         </div>
 
-        <div class="filter-buttons">
 
-            <button
-                type="button"
-                class="filter-btn active"
-                data-filter="all"
+        <!-- Product Controls -->
+        <div class="home-product-controls">
+
+            <div class="home-product-search">
+                <input
+                    type="search"
+                    id="productSearch"
+                    placeholder="Search products..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="home-category-filter">
+
+                <select id="categoryFilter">
+
+                    <option value="all">
+                        All Categories
+                    </option>
+
+                    {% for category in categories %}
+
+                        <option value="{{ category.name|lower }}">
+                            {{ category.name }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="home-product-length">
+
+                <select id="productPerPage">
+
+                    <option value="5">
+                        5 per page
+                    </option>
+
+                    <option value="10" selected>
+                        10 per page
+                    </option>
+
+                    <option value="20">
+                        20 per page
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="home-product-table-wrapper">
+
+            <table
+                class="home-product-table"
+                id="homeProductTable"
             >
-                All Products
-            </button>
 
-            {% for category in categories %}
-                <button
-                    type="button"
-                    class="filter-btn"
-                    data-filter="{{ category.slug }}"
-                >
-                    {{ category.name }}
-                </button>
-            {% endfor %}
+                <thead>
+                    <tr>
 
-        </div>
+                        <th>
+                            Image
+                        </th>
 
-        <div class="products-grid">
-
-            {% for product in featured_products %}
-                <a
-                    href="{% url 'public_product_detail' product.slug %}"
-                    class="product-card product-card-clickable"
-                    aria-label="View {{ product.name }}"
-                >
-                    <div class="product-image">
-
-                        {% if product.image %}
-                            <img
-                                src="{{ product.image.url }}"
-                                alt="{{ product.name }}"
-                                loading="lazy"
-                            >
-                        {% else %}
-                            <div class="product-placeholder">
-                                🌿
-                            </div>
-                        {% endif %}
-
-                        {% if product.featured %}
-                            <span class="product-badge">
-                                Featured
+                        <th
+                            class="sortable"
+                            data-sort="name"
+                        >
+                            Product
+                            <span class="sort-icon">
+                                ↕
                             </span>
-                        {% endif %}
+                        </th>
 
-                    </div>
-
-                    <div class="product-content">
-                        <span class="product-category">
-                            {{ product.category.name }}
-                        </span>
-
-                        <h3>
-                            {{ product.name }}
-                        </h3>
-
-                        <p>
-                            {% if product.short_description %}
-                                {{ product.short_description|truncatechars:110 }}
-                            {% elif product.description %}
-                                {{ product.description|truncatechars:110 }}
-                            {% else %}
-                                Fresh and responsibly sourced agricultural product.
-                            {% endif %}
-                        </p>
-
-                        <div class="product-footer">
-                            <span class="availability">
-                                Available
+                        <th
+                            class="sortable"
+                            data-sort="category"
+                        >
+                            Category
+                            <span class="sort-icon">
+                                ↕
                             </span>
+                        </th>
 
-                            <div class="product-price-range">
+                        <th
+                            class="sortable"
+                            data-sort="price"
+                        >
+                            Variation / Price
+                            <span class="sort-icon">
+                                ↕
+                            </span>
+                        </th>
 
-                                {% if product.min_price is not None %}
+                        <th>
+                            Qty
+                        </th>
 
-                                    {% if product.min_price == product.max_price %}
+                        <th>
+                            Add to Cart
+                        </th>
 
-                                        <span class="product-price-value">
-                                            ₹{{ product.min_price|floatformat:2 }}
-                                        </span>
+                    </tr>
+                </thead>
+
+                <tbody id="productTableBody">
+
+                    {% for product in products %}
+
+                        <tr
+                            class="product-table-row"
+                            data-name="{{ product.name|lower }}"
+                            data-category="{{ product.category.name|lower }}"
+                            data-price="{% if product.min_price is not None %}{{ product.min_price }}{% else %}0{% endif %}"
+                        >
+
+                            <td>
+
+                                <a href="{% url 'public_product_detail' product.slug %}">
+
+                                    {% if product.image %}
+
+                                        <img
+                                            src="{{ product.image.url }}"
+                                            alt="{{ product.name }}"
+                                            class="home-product-image"
+                                            loading="lazy"
+                                        >
 
                                     {% else %}
 
-                                        <span class="product-price-value">
-                                            ₹{{ product.min_price|floatformat:2 }}
-                                            -
-                                            ₹{{ product.max_price|floatformat:2 }}
-                                        </span>
+                                        <div class="home-product-placeholder">
+                                            🌿
+                                        </div>
 
                                     {% endif %}
 
-                                {% else %}
+                                </a>
 
-                                    <span class="text-secondary">
-                                        Price not available
-                                    </span>
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{% url 'public_product_detail' product.slug %}"
+                                    class="home-product-name"
+                                >
+                                    {{ product.name }}
+                                </a>
+
+                                {% if product.short_description %}
+
+                                    <div class="home-product-description">
+                                        {{ product.short_description|truncatechars:70 }}
+                                    </div>
 
                                 {% endif %}
 
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            {% empty %}
-                <p class="section-description">
-                    No featured products are currently available.
-                </p>
-            {% endfor %}
+                            </td>
+
+
+                            <td>
+
+                                <span class="home-product-category">
+                                    {{ product.category.name }}
+                                </span>
+
+                            </td>
+
+
+                            {% with variations=product.price_variations.all %}
+
+                                {% if variations %}
+
+                                    <td>
+
+                                        <select
+                                            name="variation_id"
+                                            form="cart-form-{{ product.id }}"
+                                            class="home-variation-select"
+                                            required
+                                        >
+
+                                            {% for variation in variations %}
+
+                                                <option value="{{ variation.id }}">
+
+                                                    {% if variation.name %}
+                                                        {{ variation.name }} -
+                                                    {% endif %}
+
+                                                    ₹{{ variation.price|floatformat:2 }}
+
+                                                </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            form="cart-form-{{ product.id }}"
+                                            value="1"
+                                            min="1"
+                                            class="home-quantity-input"
+                                        >
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <form
+                                            id="cart-form-{{ product.id }}"
+                                            method="post"
+                                            action="{% url 'cart_add' product.id %}"
+                                        >
+
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="home-add-cart-btn"
+                                            >
+                                                Add to Cart
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+                                {% else %}
+
+                                    <td>
+                                        <span class="text-secondary">
+                                            No variations
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        —
+                                    </td>
+
+                                    <td>
+
+                                        <button
+                                            type="button"
+                                            class="home-add-cart-btn"
+                                            disabled
+                                        >
+                                            Unavailable
+                                        </button>
+
+                                    </td>
+
+                                {% endif %}
+
+                            {% endwith %}
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
 
         </div>
 
-        <div style="padding: 40px 10px; text-align: center;"">
-            <a href="{% url 'public_product_list' %}" class="primary-btn">
-                View All Products
-            </a>
-        </div>
-        
-    </div>
-</section>
 
-<section class="section about-section" id="about">
-    <div class="container about-grid">
+        <!-- Product Table Footer -->
+        <div class="home-product-table-footer">
 
-        <div class="about-images">
-            <img
-                class="about-main-image"
-                src="{% static 'tabler/img/pages/abt-img1.jpg' %}"
-                alt="Farmer working in an agricultural field"
-                loading="lazy"
+            <div
+                class="product-table-info"
+                id="productTableInfo"
             >
-
-            <img
-                class="about-small-image"
-                src="{% static 'tabler/img/pages/abt-img2.jpg' %}"
-                alt="Green agricultural field"
-                loading="lazy"
-            >
-
-            <div class="experience-card">
-                <strong>20+</strong>
-                Years of experience
             </div>
+
+            <div
+                class="product-pagination"
+                id="productPagination"
+            >
+            </div>
+
         </div>
 
-        <div class="about-content">
-            <span class="eyebrow">
-                About Our Company
-            </span>
 
-            <h2>
-                Empowering farmers through an integrated value chain
-            </h2>
+        <div class="home-products-button">
 
-            <p>
-                Mint Grow Farm works directly with farming communities
-                to improve productivity, market access and long-term
-                sustainability.
-            </p>
-
-            <p>
-                Our technology-enabled supply chain delivers transparent,
-                safe and reliable agricultural products.
-            </p>
-
-            <ul class="about-list">
-                <li>
-                    <span>✓</span>
-                    Direct partnership with farmers
-                </li>
-
-                <li>
-                    <span>✓</span>
-                    Complete farm-to-customer traceability
-                </li>
-
-                <li>
-                    <span>✓</span>
-                    Reliable quality standards
-                </li>
-            </ul>
-            
             <a
-                href="{% url 'about' %}"
+                href="{% url 'public_product_list' %}"
                 class="primary-btn"
             >
-                Learn More About Us
-            </a>
-        </div>
-
-    </div>
-</section>
-
-<section class="stats">
-    <div class="container stats-grid">
-
-        <div class="stat-item">
-            <strong>30,000+</strong>
-            <span>Registered Farmers</span>
-        </div>
-
-        <div class="stat-item">
-            <strong>45,000+</strong>
-            <span>Acres of Farmland</span>
-        </div>
-
-        <div class="stat-item">
-            <strong>250+</strong>
-            <span>Villages Covered</span>
-        </div>
-
-        <div class="stat-item">
-            <strong>46+</strong>
-            <span>Markets Served</span>
-        </div>
-
-    </div>
-</section>
-
-<section class="section" id="sustainability">
-    <div class="container">
-
-        <div class="section-header">
-            <span class="eyebrow">
-                Our Commitment
-            </span>
-
-            <h2 class="section-title">
-                Growing a sustainable future
-            </h2>
-
-            <p class="section-description">
-                Our approach balances farmer prosperity, food safety
-                and environmental responsibility.
-            </p>
-        </div>
-
-        <div class="sustainability-grid">
-
-            <article class="sustainability-card">
-                <div class="sustainability-icon">
-                    💧
-                </div>
-
-                <h3>
-                    Water Management
-                </h3>
-
-                <p>
-                    Efficient irrigation practices help farmers save
-                    water while maintaining productivity.
-                </p>
-            </article>
-
-            <article class="sustainability-card">
-                <div class="sustainability-icon">
-                    🌾
-                </div>
-
-                <h3>
-                    Responsible Farming
-                </h3>
-
-                <p>
-                    We promote monitored cultivation practices that improve
-                    quality and protect soil health.
-                </p>
-            </article>
-
-            <article class="sustainability-card">
-                <div class="sustainability-icon">
-                    ♻️
-                </div>
-
-                <h3>
-                    Waste Reduction
-                </h3>
-
-                <p>
-                    Our processes minimise waste and create value from
-                    agricultural by-products.
-                </p>
-            </article>
-
-        </div>
-    </div>
-</section>
-
-<section class="cta-section" id="contact">
-    <div class="container">
-        <div class="cta-box">
-
-            <div class="cta-content">
-                <h2>
-                    Let’s grow together
-                </h2>
-
-                <p>
-                    Connect with our team for product enquiries,
-                    partnerships and bulk orders.
-                </p>
-            </div>
-
-            <a
-                href="{% url 'contact' %}"
-                class="secondary-btn"
-            >
-                Contact Our Team
+                View All Products
             </a>
 
         </div>
+
     </div>
 </section>
 

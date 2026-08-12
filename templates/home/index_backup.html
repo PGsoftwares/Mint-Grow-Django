@@ -1,0 +1,486 @@
+{% extends "layouts/site.html" %}
+{% load static %}
+
+{% block title %}
+    Home | Mint Grow Farm
+{% endblock %}
+
+{% block meta_description %}
+    Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural products.
+{% endblock %}
+
+{% block content %}
+
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-content">
+
+            <div class="hero-label">
+                🌱 Farmer-led integrated food company
+            </div>
+
+            <h1>
+                Fresh produce from
+                <span>farm to future.</span>
+            </h1>
+
+            <p>
+                We connect farmers, technology and markets to deliver safe,
+                traceable and high-quality agricultural products.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#products" class="primary-btn">
+                    View Our Products
+                </a>
+
+                <a href="#about" class="secondary-btn">
+                    Discover Our Story
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section
+    class="section categories-section"
+    id="categories"
+>
+    <div class="container">
+
+        <div class="section-header">
+            <span class="eyebrow">
+                Our Categories
+            </span>
+
+            <h2 class="section-title">
+                Explore our product range
+            </h2>
+
+            <p class="section-description">
+                Discover carefully sourced and professionally managed
+                agricultural products.
+            </p>
+        </div>
+
+        <!-- Categories -->
+
+
+        <div class="categories-grid">
+
+            {% for category in categories %}
+
+                <a
+                    href="{% url 'public_category_list' %}?category={{ category.slug }}"
+                    class="category-card"
+                >
+
+                    <div class="category-image">
+
+                        {% if category.image %}
+
+                            <img
+                                src="{{ category.image.url }}"
+                                alt="{{ category.name }}"
+                                loading="lazy" 
+                            >
+
+                        {% else %}
+
+                            <div class="category-placeholder">
+                                🌿
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="category-content">
+
+                        <h3>
+                            {{ category.name }}
+                        </h3>
+
+                        <p>
+                            {% if category.description %}
+                                {{ category.description|truncatechars:130 }}
+                            {% else %}
+                                Explore fresh and responsibly sourced
+                                {{ category.name|lower }} products.
+                            {% endif %}
+                        </p>
+<!-- 
+                        <span class="category-link">
+                            View Products
+                            <span aria-hidden="true">→</span>
+                        </span> -->
+
+                    </div>
+
+                </a>
+
+            {% empty %}
+
+                <div class="empty-state">
+
+                    <div class="empty-state-icon">
+                        🌿
+                    </div>
+
+                    <h2>No categories available</h2>
+
+                    <p>
+                        Product categories will appear here once they are added.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+    
+</section>
+
+<section
+    class="section products-section"
+    id="products"
+>
+    <div class="container">
+
+        <div class="section-header">
+            <span class="eyebrow">
+                Featured Products
+            </span>
+
+            <h2 class="section-title">
+                Freshness you can trust
+            </h2>
+
+            <p class="section-description">
+                Browse our featured agricultural products and filter them
+                by category.
+            </p>
+        </div>
+
+        <div class="filter-buttons">
+
+            <button
+                type="button"
+                class="filter-btn active"
+                data-filter="all"
+            >
+                All Products
+            </button>
+
+            {% for category in categories %}
+                <button
+                    type="button"
+                    class="filter-btn"
+                    data-filter="{{ category.slug }}"
+                >
+                    {{ category.name }}
+                </button>
+            {% endfor %}
+
+        </div>
+
+        <div class="products-grid">
+
+            {% for product in featured_products %}
+                <a
+                    href="{% url 'public_product_detail' product.slug %}"
+                    class="product-card product-card-clickable"
+                    aria-label="View {{ product.name }}"
+                >
+                    <div class="product-image">
+
+                        {% if product.image %}
+                            <img
+                                src="{{ product.image.url }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="product-placeholder">
+                                🌿
+                            </div>
+                        {% endif %}
+
+                        {% if product.featured %}
+                            <span class="product-badge">
+                                Featured
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="product-content">
+                        <span class="product-category">
+                            {{ product.category.name }}
+                        </span>
+
+                        <h3>
+                            {{ product.name }}
+                        </h3>
+
+                        <p>
+                            {% if product.short_description %}
+                                {{ product.short_description|truncatechars:110 }}
+                            {% elif product.description %}
+                                {{ product.description|truncatechars:110 }}
+                            {% else %}
+                                Fresh and responsibly sourced agricultural product.
+                            {% endif %}
+                        </p>
+
+                        <div class="product-footer">
+                            <span class="availability">
+                                Available
+                            </span>
+
+                            <div class="product-price-range">
+
+                                {% if product.min_price is not None %}
+
+                                    {% if product.min_price == product.max_price %}
+
+                                        <span class="product-price-value">
+                                            ₹{{ product.min_price|floatformat:2 }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="product-price-value">
+                                            ₹{{ product.min_price|floatformat:2 }}
+                                            -
+                                            ₹{{ product.max_price|floatformat:2 }}
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="text-secondary">
+                                        Price not available
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="section-description">
+                    No featured products are currently available.
+                </p>
+            {% endfor %}
+
+        </div>
+
+        <div style="padding: 40px 10px; text-align: center;"">
+            <a href="{% url 'public_product_list' %}" class="primary-btn">
+                View All Products
+            </a>
+        </div>
+        
+    </div>
+</section>
+
+<section class="section about-section" id="about">
+    <div class="container about-grid">
+
+        <div class="about-images">
+            <img
+                class="about-main-image"
+                src="{% static 'tabler/img/pages/abt-img1.jpg' %}"
+                alt="Farmer working in an agricultural field"
+                loading="lazy"
+            >
+
+            <img
+                class="about-small-image"
+                src="{% static 'tabler/img/pages/abt-img2.jpg' %}"
+                alt="Green agricultural field"
+                loading="lazy"
+            >
+
+            <div class="experience-card">
+                <strong>20+</strong>
+                Years of experience
+            </div>
+        </div>
+
+        <div class="about-content">
+            <span class="eyebrow">
+                About Our Company
+            </span>
+
+            <h2>
+                Empowering farmers through an integrated value chain
+            </h2>
+
+            <p>
+                Mint Grow Farm works directly with farming communities
+                to improve productivity, market access and long-term
+                sustainability.
+            </p>
+
+            <p>
+                Our technology-enabled supply chain delivers transparent,
+                safe and reliable agricultural products.
+            </p>
+
+            <ul class="about-list">
+                <li>
+                    <span>✓</span>
+                    Direct partnership with farmers
+                </li>
+
+                <li>
+                    <span>✓</span>
+                    Complete farm-to-customer traceability
+                </li>
+
+                <li>
+                    <span>✓</span>
+                    Reliable quality standards
+                </li>
+            </ul>
+            
+            <a
+                href="{% url 'about' %}"
+                class="primary-btn"
+            >
+                Learn More About Us
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<section class="stats">
+    <div class="container stats-grid">
+
+        <div class="stat-item">
+            <strong>30,000+</strong>
+            <span>Registered Farmers</span>
+        </div>
+
+        <div class="stat-item">
+            <strong>45,000+</strong>
+            <span>Acres of Farmland</span>
+        </div>
+
+        <div class="stat-item">
+            <strong>250+</strong>
+            <span>Villages Covered</span>
+        </div>
+
+        <div class="stat-item">
+            <strong>46+</strong>
+            <span>Markets Served</span>
+        </div>
+
+    </div>
+</section>
+
+<section class="section" id="sustainability">
+    <div class="container">
+
+        <div class="section-header">
+            <span class="eyebrow">
+                Our Commitment
+            </span>
+
+            <h2 class="section-title">
+                Growing a sustainable future
+            </h2>
+
+            <p class="section-description">
+                Our approach balances farmer prosperity, food safety
+                and environmental responsibility.
+            </p>
+        </div>
+
+        <div class="sustainability-grid">
+
+            <article class="sustainability-card">
+                <div class="sustainability-icon">
+                    💧
+                </div>
+
+                <h3>
+                    Water Management
+                </h3>
+
+                <p>
+                    Efficient irrigation practices help farmers save
+                    water while maintaining productivity.
+                </p>
+            </article>
+
+            <article class="sustainability-card">
+                <div class="sustainability-icon">
+                    🌾
+                </div>
+
+                <h3>
+                    Responsible Farming
+                </h3>
+
+                <p>
+                    We promote monitored cultivation practices that improve
+                    quality and protect soil health.
+                </p>
+            </article>
+
+            <article class="sustainability-card">
+                <div class="sustainability-icon">
+                    ♻️
+                </div>
+
+                <h3>
+                    Waste Reduction
+                </h3>
+
+                <p>
+                    Our processes minimise waste and create value from
+                    agricultural by-products.
+                </p>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<section class="cta-section" id="contact">
+    <div class="container">
+        <div class="cta-box">
+
+            <div class="cta-content">
+                <h2>
+                    Let’s grow together
+                </h2>
+
+                <p>
+                    Connect with our team for product enquiries,
+                    partnerships and bulk orders.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'contact' %}"
+                class="secondary-btn"
+            >
+                Contact Our Team
+            </a>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

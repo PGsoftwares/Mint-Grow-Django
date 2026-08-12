@@ -1,9 +1,8 @@
 from django.shortcuts import render
-
-from django.db.models import Min, Max
+from django.db.models import Min, Max, Prefetch
 
 from categories.models import ProductCategory
-from products.models import Product
+from products.models import Product, ProductPriceVariation
 
 
 def home_view(request):
@@ -17,25 +16,44 @@ def home_view(request):
         .order_by("name")
     )
 
-    featured_products = (
+
+    products = (
         Product.objects
         .filter(
             status="active",
-            featured=True,
             category__status="active",
         )
-        .select_related("category")
-        .annotate(
-            min_price=Min("price_variations__price"),
-            max_price=Max("price_variations__price"),
+        .select_related(
+            "category"
         )
-        .order_by("-created_at")[:8]
+        .prefetch_related(
+            Prefetch(
+                "price_variations",
+                queryset=ProductPriceVariation.objects.order_by(
+                    "price"
+                ),
+            )
+        )
+        .annotate(
+            min_price=Min(
+                "price_variations__price"
+            ),
+            max_price=Max(
+                "price_variations__price"
+            ),
+        )
+        .order_by(
+            "-featured",
+            "-created_at",
+        )
     )
+
 
     context = {
         "categories": categories,
-        "featured_products": featured_products,
+        "products": products,
     }
+
 
     return render(
         request,
@@ -43,8 +61,16 @@ def home_view(request):
         context,
     )
 
+
 def about_view(request):
-    return render(request, 'home/about.html')
+    return render(
+        request,
+        "home/about.html",
+    )
+
 
 def contact_view(request):
-    return render(request, 'home/contact.html')
+    return render(
+        request,
+        "home/contact.html",
+    )

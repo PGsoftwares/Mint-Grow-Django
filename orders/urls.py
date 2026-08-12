@@ -40,4 +40,23 @@ urlpatterns = [
         views.order_success,
         name="order_success",
     ),
+    
+    # Admin Order Management
+    path(
+        "admin/orders/",
+        views.admin_order_list,
+        name="admin_order_list",
+    ),
+
+    path(
+        "admin/orders/<int:order_id>/",
+        views.admin_order_detail,
+        name="admin_order_detail",
+    ),
+
+    path(
+        "admin/orders/<int:order_id>/status/",
+        views.admin_order_status_update,
+        name="admin_order_status_update",
+    ),
 ]

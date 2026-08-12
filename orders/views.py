@@ -13,8 +13,10 @@ from products.models import Product, ProductPriceVariation
 
 from .cart import Cart
 from .forms import CheckoutForm
-from .models import OrderItem
-
+from .models import Order, OrderItem
+from django.core.paginator import Paginator
+from django.db.models import Q
+from accounts.decorators import admin_required
 
 @require_POST
 def cart_add(request, product_id):
@@ -80,9 +82,10 @@ def cart_detail(request):
         product = Product.objects.filter(
             id=item["product_id"]
         ).first()
-
+        
         variation = ProductPriceVariation.objects.filter(
-            id=item["variation_id"]
+            id=item["variation_id"],
+            product=product,
         ).first()
 
         if not product or not variation:
@@ -209,7 +212,8 @@ def checkout(request):
         ).first()
 
         variation = ProductPriceVariation.objects.filter(
-            id=item["variation_id"]
+            id=item["variation_id"],
+            product=product,
         ).first()
 
         if not product or not variation:
@@ -343,4 +347,139 @@ def order_success(
         {
             "order_number": order_number,
         },
+    )
+    
+@admin_required
+def admin_order_list(request):
+    orders = (
+        Order.objects
+        .all()
+        .prefetch_related("items")
+        .order_by("-created_at")
+    )
+
+    search = request.GET.get(
+        "search",
+        "",
+    ).strip()
+
+    status = request.GET.get(
+        "status",
+        "",
+    ).strip()
+
+    if search:
+        orders = orders.filter(
+            Q(order_number__icontains=search)
+            | Q(name__icontains=search)
+            | Q(email__icontains=search)
+            | Q(phone__icontains=search)
+        )
+
+    if status:
+        orders = orders.filter(
+            status=status
+        )
+
+    paginator = Paginator(
+        orders,
+        10,
+    )
+
+    page_number = request.GET.get(
+        "page"
+    )
+
+    page_obj = paginator.get_page(
+        page_number
+    )
+
+    context = {
+        "orders": page_obj,
+        "page_obj": page_obj,
+        "search": search,
+        "selected_status": status,
+        "status_choices": Order.STATUS_CHOICES,
+    }
+
+    return render(
+        request,
+        "orders/admin/list.html",
+        context,
+    )
+
+
+@admin_required
+def admin_order_detail(
+    request,
+    order_id,
+):
+    order = get_object_or_404(
+        Order.objects.prefetch_related(
+            "items__product"
+        ),
+        id=order_id,
+    )
+
+    context = {
+        "order": order,
+        "status_choices": Order.STATUS_CHOICES,
+    }
+
+    return render(
+        request,
+        "orders/admin/detail.html",
+        context,
+    )
+
+
+@require_POST
+@admin_required
+def admin_order_status_update(
+    request,
+    order_id,
+):
+    order = get_object_or_404(
+        Order,
+        id=order_id,
+    )
+
+    status = request.POST.get(
+        "status"
+    )
+
+    valid_statuses = [
+        value
+        for value, label
+        in Order.STATUS_CHOICES
+    ]
+
+    if status not in valid_statuses:
+        messages.error(
+            request,
+            "Invalid order status.",
+        )
+
+        return redirect(
+            "admin_order_detail",
+            order_id=order.id,
+        )
+
+    order.status = status
+
+    order.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
+
+    messages.success(
+        request,
+        f"Order {order.order_number} updated to {order.get_status_display()}.",
+    )
+
+    return redirect(
+        "admin_order_detail",
+        order_id=order.id,
     )

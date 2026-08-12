@@ -11,66 +11,46 @@ from .models import Product, ProductCategory
 
 
 def public_product_list_view(request):
-    selected_category = request.GET.get(
-        "category",
-        "",
-    ).strip()
 
-    search_query = request.GET.get(
-        "search",
-        "",
-    ).strip()
-
-    products_queryset = (
+    products = (
         Product.objects
         .select_related("category")
+        .prefetch_related("price_variations")
         .filter(
             status="active",
             category__status="active",
         )
         .annotate(
-            min_price=Min("price_variations__price"),
-            max_price=Max("price_variations__price"),
+            min_price=Min(
+                "price_variations__price"
+            ),
+            max_price=Max(
+                "price_variations__price"
+            ),
         )
-        .order_by("-created_at")
+        .order_by(
+            "-featured",
+            "-created_at",
+        )
     )
 
-    if selected_category:
-        products_queryset = products_queryset.filter(
-            category__slug=selected_category,
-        )
-
-    if search_query:
-        products_queryset = products_queryset.filter(
-            Q(name__icontains=search_query)
-            | Q(sku__icontains=search_query)
-            | Q(short_description__icontains=search_query)
-            | Q(description__icontains=search_query)
-        )
-
-    paginator = Paginator(
-        products_queryset,
-        12,
-    )
-
-    page_number = request.GET.get("page")
-
-    products = paginator.get_page(
-        page_number,
-    )
 
     categories = (
         ProductCategory.objects
-        .filter(status="active")
+        .filter(
+            status="active",
+            products__status="active",
+        )
+        .distinct()
         .order_by("name")
     )
+
 
     context = {
         "products": products,
         "categories": categories,
-        "selected_category": selected_category,
-        "search_query": search_query,
     }
+
 
     return render(
         request,

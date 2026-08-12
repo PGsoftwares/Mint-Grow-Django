@@ -1,0 +1,344 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+
+            <div class="col">
+                <div class="page-pretitle">
+                    Order Management
+                </div>
+
+                <h2 class="page-title">
+                    Orders
+                </h2>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="page-body">
+    <div class="container-xl">
+
+        <div class="card">
+
+            <div class="card-header">
+                <div class="row g-3 w-100">
+
+                    <div class="col-md-8">
+                        <h3 class="card-title">
+                            Order List
+                        </h3>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="card-body border-bottom py-3">
+
+                <form method="get">
+
+                    <div class="row g-2">
+
+                        <div class="col-md-5">
+
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control"
+                                placeholder="Search order, customer, email or phone"
+                                value="{{ search }}"
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <select
+                                name="status"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    All Status
+                                </option>
+
+                                {% for value, label in status_choices %}
+
+                                    <option
+                                        value="{{ value }}"
+                                        {% if selected_status == value %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ label }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-auto">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                Search
+                            </button>
+
+                        </div>
+
+
+                        <div class="col-md-auto">
+
+                            <a
+                                href="{% url 'admin_order_list' %}"
+                                class="btn btn-outline-secondary"
+                            >
+                                Reset
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table card-table table-vcenter">
+
+                    <thead>
+
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th class="w-1"></th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for order in orders %}
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        {{ order.order_number }}
+                                    </strong>
+                                </td>
+
+
+                                <td>
+
+                                    <div>
+                                        {{ order.name }}
+                                    </div>
+
+                                    <div class="text-secondary small">
+                                        {{ order.email }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+                                    {{ order.phone }}
+                                </td>
+
+
+                                <td>
+                                    <strong>
+                                        ₹{{ order.total_amount }}
+                                    </strong>
+                                </td>
+
+
+                                <td>
+                                    {{ order.get_payment_method_display }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if order.status == "pending" %}
+
+                                        <span class="badge bg-yellow-lt">
+                                            Pending
+                                        </span>
+
+                                    {% elif order.status == "confirmed" %}
+
+                                        <span class="badge bg-blue-lt">
+                                            Confirmed
+                                        </span>
+
+                                    {% elif order.status == "processing" %}
+
+                                        <span class="badge bg-azure-lt">
+                                            Processing
+                                        </span>
+
+                                    {% elif order.status == "shipped" %}
+
+                                        <span class="badge bg-indigo-lt">
+                                            Shipped
+                                        </span>
+
+                                    {% elif order.status == "delivered" %}
+
+                                        <span class="badge bg-green-lt">
+                                            Delivered
+                                        </span>
+
+                                    {% elif order.status == "cancelled" %}
+
+                                        <span class="badge bg-red-lt">
+                                            Cancelled
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <div>
+                                        {{ order.created_at|date:"d M Y" }}
+                                    </div>
+
+                                    <div class="text-secondary small">
+                                        {{ order.created_at|date:"h:i A" }}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'admin_order_detail' order.id %}"
+                                        class="btn btn-sm btn-primary"
+                                    >
+                                        View
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="text-center text-secondary py-5"
+                                >
+                                    No orders found.
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {% if page_obj.has_other_pages %}
+
+                <div class="card-footer d-flex align-items-center">
+
+                    <p class="m-0 text-secondary">
+
+                        Showing
+                        {{ page_obj.start_index }}
+                        to
+                        {{ page_obj.end_index }}
+                        of
+                        {{ page_obj.paginator.count }}
+                        orders
+
+                    </p>
+
+
+                    <ul class="pagination m-0 ms-auto">
+
+                        {% if page_obj.has_previous %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?page={{ page_obj.previous_page_number }}&search={{ search }}&status={{ selected_status }}"
+                                >
+                                    Previous
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+
+                        <li class="page-item active">
+
+                            <span class="page-link">
+                                {{ page_obj.number }}
+                            </span>
+
+                        </li>
+
+
+                        {% if page_obj.has_next %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?page={{ page_obj.next_page_number }}&search={{ search }}&status={{ selected_status }}"
+                                >
+                                    Next
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+                    </ul>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

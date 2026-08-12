@@ -1,0 +1,431 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+
+<div class="page-header d-print-none">
+
+    <div class="container-xl">
+
+        <div class="row g-2 align-items-center">
+
+            <div class="col">
+
+                <div class="page-pretitle">
+                    Order Management
+                </div>
+
+                <h2 class="page-title">
+                    {{ order.order_number }}
+                </h2>
+
+            </div>
+
+
+            <div class="col-auto ms-auto">
+
+                <a
+                    href="{% url 'admin_order_list' %}"
+                    class="btn btn-outline-secondary"
+                >
+                    Back to Orders
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="page-body">
+
+    <div class="container-xl">
+
+        <div class="row row-cards">
+
+
+            <!-- Order Information -->
+
+            <div class="col-lg-8">
+
+                <div class="card mb-3">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">
+                            Order Items
+                        </h3>
+
+                    </div>
+
+
+                    <div class="table-responsive">
+
+                        <table class="table card-table table-vcenter">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variation</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th class="text-end">
+                                        Total
+                                    </th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for item in order.items.all %}
+
+                                    <tr>
+
+                                        <td>
+                                            <strong>
+                                                {{ item.product_name }}
+                                            </strong>
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if item.variation_name %}
+
+                                                {{ item.variation_name }}
+
+                                            {% else %}
+
+                                                <span class="text-secondary">
+                                                    —
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+                                            ₹{{ item.price }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ item.quantity }}
+                                        </td>
+
+
+                                        <td class="text-end">
+                                            <strong>
+                                                ₹{{ item.total }}
+                                            </strong>
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+
+                            <tfoot>
+
+                                <tr>
+
+                                    <td
+                                        colspan="4"
+                                        class="text-end"
+                                    >
+                                        <strong>
+                                            Order Total
+                                        </strong>
+                                    </td>
+
+                                    <td class="text-end">
+
+                                        <strong class="fs-3">
+                                            ₹{{ order.total_amount }}
+                                        </strong>
+
+                                    </td>
+
+                                </tr>
+
+                            </tfoot>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Customer -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">
+                            Customer & Delivery Information
+                        </h3>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+
+                                <div class="text-secondary">
+                                    Customer Name
+                                </div>
+
+                                <div class="fw-bold">
+                                    {{ order.name }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <div class="text-secondary">
+                                    Phone
+                                </div>
+
+                                <div>
+                                    {{ order.phone }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <div class="text-secondary">
+                                    Email
+                                </div>
+
+                                <div>
+                                    {{ order.email }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <div class="text-secondary">
+                                    Pincode
+                                </div>
+
+                                <div>
+                                    {{ order.pincode }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-12">
+
+                                <div class="text-secondary">
+                                    Delivery Address
+                                </div>
+
+                                <div>
+                                    {{ order.address }}
+                                    <br>
+                                    {{ order.city }},
+                                    {{ order.state }}
+                                    -
+                                    {{ order.pincode }}
+                                </div>
+
+                            </div>
+
+
+                            {% if order.notes %}
+
+                                <div class="col-12">
+
+                                    <div class="text-secondary">
+                                        Customer Notes
+                                    </div>
+
+                                    <div>
+                                        {{ order.notes|linebreaksbr }}
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Right Sidebar -->
+
+            <div class="col-lg-4">
+
+
+                <!-- Status -->
+
+                <div class="card mb-3">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">
+                            Order Status
+                        </h3>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <form
+                            method="post"
+                            action="{% url 'admin_order_status_update' order.id %}"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Status
+                                </label>
+
+
+                                <select
+                                    name="status"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    {% for value, label in status_choices %}
+
+                                        <option
+                                            value="{{ value }}"
+                                            {% if order.status == value %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            {{ label }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary w-100"
+                            >
+                                Update Status
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Summary -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">
+                            Order Summary
+                        </h3>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+
+                            <div class="text-secondary">
+                                Order Number
+                            </div>
+
+                            <strong>
+                                {{ order.order_number }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <div class="text-secondary">
+                                Payment Method
+                            </div>
+
+                            <strong>
+                                {{ order.get_payment_method_display }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <div class="text-secondary">
+                                Order Date
+                            </div>
+
+                            <strong>
+                                {{ order.created_at|date:"d M Y, h:i A" }}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="text-secondary">
+                                Total Amount
+                            </div>
+
+                            <strong class="fs-2">
+                                ₹{{ order.total_amount }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -11,22 +11,21 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
 
 {% block content %}
 
-<!-- Page Banner -->
 <section class="page-banner">
     <div class="container">
 
-        <h1>Our Products</h1> 
+        <h1>
+            Our Products
+        </h1>
 
         <p>
-            Explore fresh, traceable and responsibly sourced agricultural
-            products.
+            Explore fresh, traceable and responsibly sourced agricultural products.
         </p>
 
     </div>
 </section>
 
 
-<!-- Products -->
 <section
     class="section products-section"
     id="products"
@@ -40,282 +39,373 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
             </h2>
 
             <p class="section-description">
-                Browse our featured agricultural products and filter them
-                by category.
+                Search, filter and select your preferred product variation.
             </p>
 
         </div>
 
 
-        <div class="products-layout">
+        <!-- Search / Category / Per Page -->
+        <div class="home-product-controls">
 
-            <!-- Category Sidebar -->
-            <aside class="products-sidebar">
+            <div class="home-product-search">
 
-                <div class="filter-buttons">
+                <input
+                    type="search"
+                    id="productSearch"
+                    placeholder="Search products..."
+                    autocomplete="off"
+                >
 
-                    <a
-                        href="{% url 'public_product_list' %}"
-                        class="filter-btn {% if not selected_category %}active{% endif %}"
-                    >
-                        All Products
-                    </a>
+            </div>
+
+
+            <div class="home-category-filter">
+
+                <select id="categoryFilter">
+
+                    <option value="all">
+                        All Categories
+                    </option>
 
                     {% for category in categories %}
 
-                        <a
-                            href="?category={{ category.slug }}"
-                            class="filter-btn {% if selected_category == category.slug %}active{% endif %}"
-                        >
+                        <option value="{{ category.name|lower }}">
                             {{ category.name }}
-                        </a>
+                        </option>
 
                     {% endfor %}
 
-                </div>
+                </select>
 
-            </aside>
-
-
-            <!-- Products -->
-            <div class="products-main">
-
-                <div class="products-grid">
-
-                    {% for product in products %}
-
-                        <a
-                            href="{% url 'public_product_detail' product.slug %}"
-                            class="product-card product-card-clickable"
-                            aria-label="View {{ product.name }}"
-                        >
-
-                            <div class="product-image">
-
-                                {% if product.image %}
-
-                                    <img
-                                        src="{{ product.image.url }}"
-                                        alt="{{ product.name }}"
-                                        loading="lazy"
-                                    >
-
-                                {% else %}
-
-                                    <div class="product-placeholder">
-                                        🌿
-                                    </div>
-
-                                {% endif %}
+            </div>
 
 
-                                {% if product.featured %}
+            <div class="home-product-length">
 
-                                    <span class="product-badge">
-                                        Featured
-                                    </span>
+                <select id="productPerPage">
 
-                                {% endif %}
+                    <option value="5">
+                        5 per page
+                    </option>
 
-                            </div>
+                    <option value="10" selected>
+                        10 per page
+                    </option>
 
+                    <option value="20">
+                        20 per page
+                    </option>
 
-                            <div class="product-content">
-
-                                <span class="product-category">
-                                    {{ product.category.name }}
-                                </span>
-
-                                <h3>
-                                    {{ product.name }}
-                                </h3>
-
-                                <p>
-                                    {% if product.short_description %}
-
-                                        {{ product.short_description|truncatechars:110 }}
-
-                                    {% elif product.description %}
-
-                                        {{ product.description|truncatechars:110 }}
-
-                                    {% else %}
-
-                                        Fresh and responsibly sourced agricultural product.
-
-                                    {% endif %}
-                                </p>
-
-
-                                <div class="product-footer">
-
-                                    <span class="availability">
-                                        Available
-                                    </span>
-
-
-                                    <div class="product-price-range">
-
-                                        {% if product.min_price is not None %}
-
-                                            {% if product.min_price == product.max_price %}
-
-                                                <span class="product-price-value">
-                                                    ₹{{ product.min_price|floatformat:2 }}
-                                                </span>
-
-                                            {% else %}
-
-                                                <span class="product-price-value">
-                                                    ₹{{ product.min_price|floatformat:2 }}
-                                                    -
-                                                    ₹{{ product.max_price|floatformat:2 }}
-                                                </span>
-
-                                            {% endif %}
-
-                                        {% else %}
-
-                                            <span class="text-secondary">
-                                                Price not available
-                                            </span>
-
-                                        {% endif %}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </a>
-
-                    {% empty %}
-
-                        <p class="section-description">
-                            No products are currently available.
-                        </p>
-
-                    {% endfor %}
-
-                </div>
+                </select>
 
             </div>
 
         </div>
 
 
-        <!-- Pagination -->
-        {% if products.paginator.num_pages > 1 %}
-            <nav
-                class="products-pagination"
-                aria-label="Product pagination"
+        <!-- Product Table -->
+        <div class="home-product-table-wrapper">
+
+            <table
+                class="home-product-table"
+                id="homeProductTable"
             >
-                <ul class="pagination-list">
 
-                    {% if products.has_previous %}
-                        <li>
-                            <a
-                                href="?page={{ products.previous_page_number }}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
-                                class="pagination-link"
-                                aria-label="Previous page"
-                            >
-                                Previous
-                            </a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <span class="pagination-link disabled">
-                                Previous
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Image
+                        </th>
+
+
+                        <th
+                            class="sortable"
+                            data-sort="name"
+                        >
+                            Product
+
+                            <span class="sort-icon">
+                                ↕
                             </span>
-                        </li>
-                    {% endif %}
+                        </th>
 
 
-                    {% for page_number in products.paginator.page_range %}
+                        <th
+                            class="sortable"
+                            data-sort="category"
+                        >
+                            Category
 
-                        {% if page_number == products.number %}
+                            <span class="sort-icon">
+                                ↕
+                            </span>
+                        </th>
 
-                            <li>
-                                <span class="pagination-link active">
-                                    {{ page_number }}
-                                </span>
-                            </li>
 
-                        {% elif page_number >= products.number|add:"-2" and page_number <= products.number|add:"2" %}
+                        <th
+                            class="sortable"
+                            data-sort="price"
+                        >
+                            Variation / Price
 
-                            <li>
+                            <span class="sort-icon">
+                                ↕
+                            </span>
+                        </th>
+
+
+                        <th>
+                            Qty
+                        </th>
+
+
+                        <th>
+                            Add to Cart
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="productTableBody">
+
+                    {% for product in products %}
+
+                        <tr
+                            class="product-table-row"
+                            data-name="{{ product.name|lower }}"
+                            data-category="{{ product.category.name|lower }}"
+                            data-price="{% if product.min_price is not None %}{{ product.min_price }}{% else %}0{% endif %}"
+                        >
+
+                            <!-- Image -->
+                            <td>
+
                                 <a
-                                    href="?page={{ page_number }}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
-                                    class="pagination-link"
+                                    href="{% url 'public_product_detail' product.slug %}"
                                 >
-                                    {{ page_number }}
-                                </a>
-                            </li>
 
-                        {% endif %}
+                                    {% if product.image %}
+
+                                        <img
+                                            src="{{ product.image.url }}"
+                                            alt="{{ product.name }}"
+                                            class="home-product-image"
+                                            loading="lazy"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="home-product-placeholder">
+                                            🌿
+                                        </div>
+
+                                    {% endif %}
+
+                                </a>
+
+                            </td>
+
+
+                            <!-- Product -->
+                            <td>
+
+                                <a
+                                    href="{% url 'public_product_detail' product.slug %}"
+                                    class="home-product-name"
+                                >
+                                    {{ product.name }}
+                                </a>
+
+
+                                {% if product.short_description %}
+
+                                    <div class="home-product-description">
+
+                                        {{ product.short_description|truncatechars:70 }}
+
+                                    </div>
+
+                                {% elif product.description %}
+
+                                    <div class="home-product-description">
+
+                                        {{ product.description|truncatechars:70 }}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Category -->
+                            <td>
+
+                                <span class="home-product-category">
+
+                                    {{ product.category.name }}
+
+                                </span>
+
+                            </td>
+
+
+                            {% with variations=product.price_variations.all %}
+
+                                {% if variations %}
+
+                                    <!-- Variation -->
+                                    <td>
+
+                                        <select
+                                            name="variation_id"
+                                            form="cart-form-{{ product.id }}"
+                                            class="home-variation-select"
+                                            required
+                                        >
+
+                                            {% for variation in variations %}
+
+                                                <option
+                                                    value="{{ variation.id }}"
+                                                >
+
+                                                    {% if variation.name %}
+
+                                                        {{ variation.name }} -
+
+                                                    {% endif %}
+
+                                                    ₹{{ variation.price|floatformat:2 }}
+
+                                                </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </td>
+
+
+                                    <!-- Quantity -->
+                                    <td>
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            form="cart-form-{{ product.id }}"
+                                            value="1"
+                                            min="1"
+                                            class="home-quantity-input"
+                                        >
+
+                                    </td>
+
+
+                                    <!-- Cart -->
+                                    <td>
+
+                                        <form
+                                            id="cart-form-{{ product.id }}"
+                                            method="post"
+                                            action="{% url 'cart_add' product.id %}"
+                                        >
+
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="home-add-cart-btn"
+                                            >
+                                                Add to Cart
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+
+                                {% else %}
+
+                                    <td>
+
+                                        <span class="text-secondary">
+                                            No variations
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+                                        —
+                                    </td>
+
+
+                                    <td>
+
+                                        <button
+                                            type="button"
+                                            class="home-add-cart-btn"
+                                            disabled
+                                        >
+                                            Unavailable
+                                        </button>
+
+                                    </td>
+
+                                {% endif %}
+
+                            {% endwith %}
+
+                        </tr>
+
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="home-product-empty"
+                            >
+                                No products are currently available.
+                            </td>
+
+                        </tr>
 
                     {% endfor %}
 
+                </tbody>
 
-                    {% if products.has_next %}
-                        <li>
-                            <a
-                                href="?page={{ products.next_page_number }}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
-                                class="pagination-link"
-                                aria-label="Next page"
-                            >
-                                Next
-                            </a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <span class="pagination-link disabled">
-                                Next
-                            </span>
-                        </li>
-                    {% endif %}
+            </table>
 
-                </ul>
+        </div>
 
-                <div class="pagination-summary">
-                    Page {{ products.number }}
-                    of {{ products.paginator.num_pages }}
-                </div>
 
-            </nav>
-        {% endif %}
+        <!-- Table Footer -->
+        <div class="home-product-table-footer">
+
+            <div
+                class="product-table-info"
+                id="productTableInfo"
+            >
+            </div>
+
+
+            <div
+                class="product-pagination"
+                id="productPagination"
+            >
+            </div>
+
+        </div>
 
     </div>
 </section>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const productCards = document.querySelectorAll(".product-card");
-
-    filterButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-            const selectedCategory = button.dataset.filter;
-
-            filterButtons.forEach(function (item) {
-                item.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            productCards.forEach(function (card) {
-                const shouldShow =
-                    selectedCategory === "all" ||
-                    card.dataset.category === selectedCategory;
-
-                card.style.display = shouldShow ? "" : "none";
-            });
-        });
-    });
-
-    
-});
-</script>
 
 {% endblock %}
