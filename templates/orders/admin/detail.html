@@ -69,9 +69,19 @@
 
                                 <tr>
                                     <th>Product</th>
-                                    <th>Variation</th>
-                                    <th>Price</th>
-                                    <th>Qty</th>
+
+                                    <th>
+                                        Variation
+                                    </th>
+
+                                    <th>
+                                        Price
+                                    </th>
+
+                                    <th>
+                                        Qty
+                                    </th>
+
                                     <th class="text-end">
                                         Total
                                     </th>
@@ -87,9 +97,11 @@
                                     <tr>
 
                                         <td>
+
                                             <strong>
                                                 {{ item.product_name }}
                                             </strong>
+
                                         </td>
 
 
@@ -97,7 +109,9 @@
 
                                             {% if item.variation_name %}
 
-                                                {{ item.variation_name }}
+                                                <span class="badge bg-blue-lt">
+                                                    {{ item.variation_name }}
+                                                </span>
 
                                             {% else %}
 
@@ -111,19 +125,48 @@
 
 
                                         <td>
-                                            ₹{{ item.price }}
+
+                                            <span class="fw-semibold">
+                                                ₹{{ item.price|floatformat:2 }}
+                                            </span>
+
                                         </td>
 
 
                                         <td>
-                                            {{ item.quantity }}
-                                        </td>
+    <span class="fw-semibold">
+        {{ item.quantity }}
+
+        {% if item.unit == "kg" %}
+            kg
+        {% elif item.unit == "pcs" %}
+            pcs
+        {% elif item.unit %}
+            {{ item.unit }}
+        {% endif %}
+    </span>
+</td>
 
 
                                         <td class="text-end">
+
                                             <strong>
-                                                ₹{{ item.total }}
+                                                ₹{{ item.total|floatformat:2 }}
                                             </strong>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% empty %}
+
+                                    <tr>
+
+                                        <td
+                                            colspan="5"
+                                            class="text-center text-secondary py-4"
+                                        >
+                                            No order items available.
                                         </td>
 
                                     </tr>
@@ -146,10 +189,11 @@
                                         </strong>
                                     </td>
 
+
                                     <td class="text-end">
 
                                         <strong class="fs-3">
-                                            ₹{{ order.total_amount }}
+                                            ₹{{ order.total_amount|floatformat:2 }}
                                         </strong>
 
                                     </td>

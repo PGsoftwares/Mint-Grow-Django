@@ -6,20 +6,23 @@
 {% endblock %}
 
 {% block meta_description %}
-{% if product.short_description %}{{ product.short_description|truncatechars:155 }}{% else %}View {{ product.name }} from Mint Grow Farm.{% endif %}
+{% if product.short_description %}
+    {{ product.short_description|truncatechars:155 }}
+{% else %}
+    View {{ product.name }} from Mint Grow Farm.
+{% endif %}
 {% endblock %}
+
 
 {% block content %}
 
-<!-- Product Detail -->
 <section class="section product-detail-section">
+
     <div class="container">
 
         <!-- Breadcrumb -->
-        <nav
-            class="breadcrumb"
-            aria-label="Breadcrumb"
-        >
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+
             <a href="{% url 'home' %}">
                 Home
             </a>
@@ -32,9 +35,7 @@
 
             <span>/</span>
 
-            <a
-                href="{% url 'public_product_list' %}?category={{ product.category.slug }}"
-            >
+            <a href="{% url 'public_product_list' %}?category={{ product.category.slug }}">
                 {{ product.category.name }}
             </a>
 
@@ -43,6 +44,7 @@
             <span>
                 {{ product.name }}
             </span>
+
         </nav>
 
 
@@ -52,20 +54,27 @@
             <div class="product-detail-image">
 
                 {% if product.image %}
+
                     <img
                         src="{{ product.image.url }}"
                         alt="{{ product.name }}"
                     >
+
                 {% else %}
+
                     <div class="product-detail-placeholder">
                         🌿
                     </div>
+
                 {% endif %}
 
+
                 {% if product.featured %}
+
                     <span class="featured-badge">
                         Featured
                     </span>
+
                 {% endif %}
 
             </div>
@@ -82,17 +91,23 @@
                     {{ product.name }}
                 </h2>
 
+
                 {% if product.short_description %}
+
                     <p class="product-short-description">
                         {{ product.short_description }}
                     </p>
+
                 {% endif %}
 
+
+                <!-- Price Variations -->
                 <div class="product-detail-price-list">
 
                     <h3 class="mb-3">
                         Price Options
                     </h3>
+
 
                     {% if product.price_variations.all %}
 
@@ -105,21 +120,31 @@
                                 Select Option
                             </label>
 
+
                             <select
                                 id="priceVariation"
                                 class="form-select"
                             >
+
                                 {% for variation in product.price_variations.all %}
+
                                     <option
                                         value="{{ variation.id }}"
                                         data-price="{{ variation.price }}"
+                                        data-stock="{{ variation.stock }}"
+                                        data-unit="{{ variation.stock_unit }}"
                                     >
                                         {{ variation.name }}
+                                        -
+                                        ₹{{ variation.price|floatformat:2 }}
                                     </option>
+
                                 {% endfor %}
+
                             </select>
 
 
+                            <!-- Selected Price -->
                             <div class="selected-product-price mt-3">
 
                                 <span class="price-caption">
@@ -127,11 +152,51 @@
                                 </span>
 
                                 <strong id="selectedPrice">
-                                    {% with first_price=product.price_variations.first %}
-                                        {% if first_price %}
-                                            ₹{{ first_price.price|floatformat:2 }}
+
+                                    {% with variation=product.price_variations.first %}
+
+                                        {% if variation %}
+                                            ₹{{ variation.price|floatformat:2 }}
                                         {% endif %}
+
                                     {% endwith %}
+
+                                </strong>
+
+                            </div>
+
+
+                            <!-- Selected Stock -->
+                            <div class="selected-product-price mt-2">
+
+                                <span class="price-caption">
+                                    Available Stock
+                                </span>
+
+                                <strong
+                                    id="selectedStock"
+                                    class="available-text"
+                                >
+
+                                    {% with variation=product.price_variations.first %}
+
+                                        {% if variation %}
+
+                                            {% if variation.stock > 0 %}
+
+                                                {{ variation.stock|floatformat:-2 }}
+                                                {{ variation.stock_unit }}
+
+                                            {% else %}
+
+                                                Out of Stock
+
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    {% endwith %}
+
                                 </strong>
 
                             </div>
@@ -148,36 +213,55 @@
 
                 </div>
 
+
+                <!-- Product Meta -->
                 <div class="product-meta">
 
                     <div class="product-meta-row">
-                        <span>SKU</span>
+
+                        <span>
+                            SKU
+                        </span>
 
                         <strong>
                             {{ product.sku|default:"Not available" }}
                         </strong>
+
                     </div>
 
-                    <div class="product-meta-row">
-                        <span>Category</span>
 
-                        <a
-                            href="{% url 'public_product_list' %}?category={{ product.category.slug }}"
-                        >
+                    <div class="product-meta-row">
+
+                        <span>
+                            Category
+                        </span>
+
+                        <a href="{% url 'public_product_list' %}?category={{ product.category.slug }}">
                             {{ product.category.name }}
                         </a>
+
                     </div>
 
-                    <div class="product-meta-row">
-                        <span>Availability</span>
 
-                        <strong class="available-text">
+                    <div class="product-meta-row">
+
+                        <span>
+                            Availability
+                        </span>
+
+                        <strong
+                            class="available-text"
+                            id="availabilityText"
+                        >
                             Available
                         </strong>
+
                     </div>
 
                 </div>
 
+
+                <!-- Add To Cart -->
                 {% if product.price_variations.all %}
 
                     <form
@@ -188,6 +272,7 @@
 
                         {% csrf_token %}
 
+
                         <input
                             type="hidden"
                             name="variation_id"
@@ -195,35 +280,62 @@
                             value="{{ product.price_variations.first.id }}"
                         >
 
-                        <div class="product-quantity">
 
-                            <label
-                                for="quantity"
-                                class="product-price-label"
-                            >
-                                Quantity
-                            </label>
+                        <!-- Qty + Add to Cart + View Cart -->
+                        <div class="product-actions-inline">
 
-                            <input
-                                type="number"
-                                name="quantity"
-                                id="quantity"
-                                class="form-control"
-                                value="1"
-                                min="1"
-                            >
+                            <!-- Quantity -->
+                            <div class="product-quantity-inline">
 
-                        </div>
+                                <label
+                                    for="quantity"
+                                    class="product-price-label"
+                                >
+                                    Qty
+                                </label>
 
-                        <div class="product-actions">
+                                <div class="input-group">
 
+                                    <input
+                                        type="number"
+                                        name="quantity"
+                                        id="quantity"
+                                        class="form-control"
+                                        value="1"
+                                        min="1"
+                                    >
+
+                                    <span
+                                        class="input-group-text"
+                                        id="quantityUnit"
+                                    >
+
+                                        {% with variation=product.price_variations.first %}
+
+                                            {% if variation %}
+                                                {{ variation.stock_unit }}
+                                            {% endif %}
+
+                                        {% endwith %}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Add To Cart -->
                             <button
                                 type="submit"
                                 class="btn btn-primary"
+                                id="addToCartButton"
                             >
                                 Add to Cart
                             </button>
 
+
+                            <!-- View Cart -->
                             <a
                                 href="{% url 'cart_detail' %}"
                                 class="btn product-back-btn"
@@ -245,181 +357,388 @@
         <!-- Full Description -->
         <div class="product-description-card">
 
-            <h2>Product Description</h2>
+            <h2>
+                Product Description
+            </h2>
+
 
             {% if product.description %}
+
                 <div class="product-description">
                     {{ product.description|linebreaks }}
                 </div>
+
             {% elif product.short_description %}
+
                 <div class="product-description">
                     {{ product.short_description|linebreaks }}
                 </div>
+
             {% else %}
+
                 <p>
                     More information about this product will be available soon.
                 </p>
+
             {% endif %}
 
         </div>
 
     </div>
+
 </section>
 
 
 <!-- Related Products -->
 {% if related_products %}
-    <section class="section related-products-section">
-        <div class="container">
 
-            <h2 class="section-title">
-                Related Products
-            </h2>
+<section class="section related-products-section">
 
-            <p class="section-text">
-                Explore more products from the
-                {{ product.category.name }} category.
-            </p>
+    <div class="container">
 
-            <div class="grid products-grid">
+        <h2 class="section-title">
+            Related Products
+        </h2>
 
-                {% for related_product in related_products %}
+        <p class="section-text">
+            Explore more products from the
+            {{ product.category.name }} category.
+        </p>
 
-                    <article class="product-card">
 
-                        <a
-                            href="{% url 'public_product_detail' related_product.slug %}"
-                            class="product-image-link"
-                        >
-                            <div class="product-img">
+        <div class="grid products-grid">
 
-                                {% if related_product.image %}
-                                    <img
-                                        src="{{ related_product.image.url }}"
-                                        alt="{{ related_product.name }}"
-                                        loading="lazy"
-                                    >
-                                {% else %}
-                                    <div class="product-placeholder">
-                                        🌿
-                                    </div>
-                                {% endif %}
+            {% for related_product in related_products %}
 
-                            </div>
-                        </a>
+                <article class="product-card">
 
-                        <div class="product-body">
+                    <a
+                        href="{% url 'public_product_detail' related_product.slug %}"
+                        class="product-image-link"
+                    >
 
-                            <span class="tag">
-                                {{ related_product.category.name }}
-                            </span>
+                        <div class="product-img">
 
-                            <h3>
-                                <a
-                                    href="{% url 'public_product_detail' related_product.slug %}"
+                            {% if related_product.image %}
+
+                                <img
+                                    src="{{ related_product.image.url }}"
+                                    alt="{{ related_product.name }}"
+                                    loading="lazy"
                                 >
-                                    {{ related_product.name }}
-                                </a>
-                            </h3>
 
-                            <p>
-                                {% if related_product.short_description %}
-                                    {{ related_product.short_description|truncatechars:100 }}
-                                {% else %}
-                                    {{ related_product.description|truncatechars:100 }}
-                                {% endif %}
-                            </p>
+                            {% else %}
 
-                            <div class="product-footer">
-
-                                <div class="product-price">
-                                    ₹{{ related_product.price|floatformat:2 }}
+                                <div class="product-placeholder">
+                                    🌿
                                 </div>
 
-                                <a
-                                    href="{% url 'public_product_detail' related_product.slug %}"
-                                    class="product-link"
-                                >
-                                    View Details →
-                                </a>
-
-                            </div>
+                            {% endif %}
 
                         </div>
 
-                    </article>
+                    </a>
 
-                {% endfor %}
 
-            </div>
+                    <div class="product-body">
+
+                        <span class="tag">
+                            {{ related_product.category.name }}
+                        </span>
+
+
+                        <h3>
+
+                            <a href="{% url 'public_product_detail' related_product.slug %}">
+                                {{ related_product.name }}
+                            </a>
+
+                        </h3>
+
+
+                        <p>
+
+                            {% if related_product.short_description %}
+
+                                {{ related_product.short_description|truncatechars:100 }}
+
+                            {% else %}
+
+                                {{ related_product.description|truncatechars:100 }}
+
+                            {% endif %}
+
+                        </p>
+
+
+                        <div class="product-footer">
+
+                            <a
+                                href="{% url 'public_product_detail' related_product.slug %}"
+                                class="product-link"
+                            >
+                                View Details →
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
 
         </div>
-    </section>
+
+    </div>
+
+</section>
+
 {% endif %}
 
+{% endblock %}
+
+
+{% block extra_js %}
+
 <script>
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        const variationSelect =
-            document.getElementById(
-                "priceVariation"
-            );
+    const variationSelect =
+        document.getElementById("priceVariation");
 
-        const selectedPrice =
-            document.getElementById(
-                "selectedPrice"
-            );
+    const selectedPrice =
+        document.getElementById("selectedPrice");
 
-        const cartVariationId =
-            document.getElementById(
-                "cartVariationId"
-            );
+    const selectedStock =
+        document.getElementById("selectedStock");
 
-        if (
-            !variationSelect ||
-            !selectedPrice
-        ) {
+    const cartVariationId =
+        document.getElementById("cartVariationId");
+
+    const quantityInput =
+        document.getElementById("quantity");
+
+    const quantityUnit =
+        document.getElementById("quantityUnit");
+
+    const addToCartButton =
+        document.getElementById("addToCartButton");
+
+    const availabilityText =
+        document.getElementById("availabilityText");
+
+
+    if (!variationSelect) {
+        return;
+    }
+
+
+    function formatStock(value) {
+
+        return parseFloat(
+            value.toFixed(2)
+        ).toString();
+
+    }
+
+
+    function updateVariation() {
+
+        const selectedOption =
+            variationSelect.options[
+                variationSelect.selectedIndex
+            ];
+
+
+        if (!selectedOption) {
             return;
         }
 
 
-        function updateVariation() {
+        const price = parseFloat(
+            selectedOption.dataset.price || "0"
+        );
 
-            const selectedOption =
-                variationSelect.options[
-                    variationSelect.selectedIndex
-                ];
 
-            const price =
-                parseFloat(
-                    selectedOption.dataset.price
-                );
+        const stock = parseFloat(
+            selectedOption.dataset.stock || "0"
+        );
+
+
+        const unit =
+            selectedOption.dataset.unit || "";
+
+
+        // Price
+        if (selectedPrice) {
 
             selectedPrice.textContent =
                 "₹" + price.toFixed(2);
 
-            if (cartVariationId) {
+        }
 
-                cartVariationId.value =
-                    selectedOption.value;
+
+        // Variation ID
+        if (cartVariationId) {
+
+            cartVariationId.value =
+                selectedOption.value;
+
+        }
+
+
+        // Quantity Unit
+        if (quantityUnit) {
+
+            quantityUnit.textContent =
+                unit;
+
+        }
+
+
+        // Stock
+        if (selectedStock) {
+
+            if (stock > 0) {
+
+                selectedStock.textContent =
+                    formatStock(stock) +
+                    " " +
+                    unit;
+
+                selectedStock.classList.remove(
+                    "text-danger"
+                );
+
+                selectedStock.classList.add(
+                    "available-text"
+                );
+
+            } else {
+
+                selectedStock.textContent =
+                    "Out of Stock";
+
+                selectedStock.classList.remove(
+                    "available-text"
+                );
+
+                selectedStock.classList.add(
+                    "text-danger"
+                );
 
             }
 
         }
 
 
-        variationSelect.addEventListener(
-            "change",
-            updateVariation
-        );
+        // Availability
+        if (availabilityText) {
+
+            if (stock > 0) {
+
+                availabilityText.textContent =
+                    "Available";
+
+                availabilityText.classList.remove(
+                    "text-danger"
+                );
+
+                availabilityText.classList.add(
+                    "available-text"
+                );
+
+            } else {
+
+                availabilityText.textContent =
+                    "Out of Stock";
+
+                availabilityText.classList.remove(
+                    "available-text"
+                );
+
+                availabilityText.classList.add(
+                    "text-danger"
+                );
+
+            }
+
+        }
 
 
-        updateVariation();
+        // Quantity
+        if (quantityInput) {
+
+            if (stock > 0) {
+
+                quantityInput.disabled = false;
+
+                quantityInput.max =
+                    Math.floor(stock);
+
+
+                const currentQuantity =
+                    parseInt(
+                        quantityInput.value || "1",
+                        10
+                    );
+
+
+                if (
+                    currentQuantity > Math.floor(stock)
+                    ||
+                    currentQuantity < 1
+                ) {
+
+                    quantityInput.value = 1;
+
+                }
+
+            } else {
+
+                quantityInput.value = 1;
+
+                quantityInput.disabled = true;
+
+            }
+
+        }
+
+
+        // Add To Cart
+        if (addToCartButton) {
+
+            if (stock > 0) {
+
+                addToCartButton.disabled = false;
+
+                addToCartButton.textContent =
+                    "Add to Cart";
+
+            } else {
+
+                addToCartButton.disabled = true;
+
+                addToCartButton.textContent =
+                    "Out of Stock";
+
+            }
+
+        }
 
     }
-);
+
+
+    variationSelect.addEventListener(
+        "change",
+        updateVariation
+    );
+
+
+    updateVariation();
+
+});
 </script>
 
 {% endblock %}

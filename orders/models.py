@@ -116,6 +116,12 @@ class OrderItem(models.Model):
         null=True,
     )
 
+    unit = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+    )
+
     price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -135,4 +141,7 @@ class OrderItem(models.Model):
     )
 
     def __str__(self):
-        return f"{self.product_name} - {self.quantity}"
+        return (
+            f"{self.product_name} - "
+            f"{self.quantity} {self.unit or ''}"
+        )

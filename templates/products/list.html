@@ -45,14 +45,14 @@
         >
             <thead>
                 <tr>
+                    <th style="width: 60px;">S.No</th>
                     <th>Image</th>
                     <th>Product Name</th>
                     <th>Category</th>
                     <th>SKU</th>
-                    <th>Price</th>
+                    <th>Price / Stock</th>
                     <th>Featured</th>
                     <th>Status</th>
-                    <th>Created</th>
                     <th class="w-1">Actions</th>
                 </tr>
             </thead>
@@ -60,6 +60,7 @@
             <tbody>
                 {% for product in products %}
                     <tr>
+                        <td class="text-secondary serial-number"></td>
                         <td>
                             {% if product.image %}
                                 <img
@@ -93,7 +94,7 @@
                             {% if product.short_description %}
                                 <div
                                     class="text-secondary text-truncate mt-1"
-                                    style="max-width: 200px;"
+                                    style="max-width: 150px;"
                                 >
                                     {{ product.short_description }}
                                 </div>
@@ -112,34 +113,57 @@
                             </span>
                         </td>
 
-                        <td
-                            data-order="{{ product.min_price|default:0 }}"
-                        >
-                            {% if product.min_price is not None %}
+                        <td style="min-width: 200px;">
 
-                                {% if product.min_price == product.max_price %}
+                            {% for variation in product.price_variations.all %}
 
-                                    <span class="fw-semibold">
-                                        ₹{{ product.min_price|floatformat:2 }}
-                                    </span>
+                                <div class="{% if not forloop.last %}mb-2{% endif %}">
 
-                                {% else %}
+                                    <div class="fw-semibold">
+                                        {{ variation.name }}
+                                    </div>
 
-                                    <span class="fw-semibold">
-                                        ₹{{ product.min_price|floatformat:2 }}
-                                        -
-                                        ₹{{ product.max_price|floatformat:2 }}
-                                    </span>
+                                    <div class="small">
 
-                                {% endif %}
+                                        <span class="text-success fw-semibold">
+                                            ₹{{ variation.price|floatformat:2 }}
+                                        </span>
 
-                            {% else %}
+                                        <span class="text-secondary mx-1">
+                                            •
+                                        </span>
+
+                                        {% if variation.stock > 0 %}
+
+                                            <span class="text-secondary">
+                                                Stock:
+                                            </span>
+
+                                            <span class="fw-semibold">
+                                                {{ variation.stock|floatformat:-2 }}
+                                                {{ variation.get_stock_unit_display }}
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-red-lt">
+                                                Out of Stock
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            {% empty %}
 
                                 <span class="text-secondary">
-                                    No price
+                                    No variations
                                 </span>
 
-                            {% endif %}
+                            {% endfor %}
+
                         </td>
 
                         <td>
@@ -164,13 +188,7 @@
                                     Inactive
                                 </span>
                             {% endif %}
-                        </td>
-
-                        <td
-                            data-order="{{ product.created_at|date:'Y-m-d H:i:s' }}"
-                        >
-                            {{ product.created_at|date:"d M Y" }}
-                        </td>
+                        </td>                        
 
                         <td class="text-end">
                             {% url "product_update" product.id as edit_url %}
@@ -190,36 +208,68 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        new DataTable("#productTable", {
-            pageLength: 10,
+document.addEventListener("DOMContentLoaded", function () {
 
-            lengthMenu: [
-                [10, 25, 50, 100],
-                [10, 25, 50, 100]
-            ],
+    const table = new DataTable("#productTable", {
 
-            order: [
-                [7, "desc"]
-            ],
+        pageLength: 10,
 
-            columnDefs: [
-                {
-                    targets: [0, 8],
-                    orderable: false,
-                    searchable: false
-                }
-            ],
+        lengthMenu: [
+            [10, 25, 50, 100],
+            [10, 25, 50, 100]
+        ],
 
-            language: {
-                search: "Search:",
-                searchPlaceholder: "Search products...",
-                lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ products",
-                zeroRecords: "No matching products found",
-                emptyTable: "No products available"
+        order: [
+            [2, "asc"]
+        ],
+
+        columnDefs: [
+            {
+                targets: [0, 1, 8],
+                orderable: false
+            },
+            {
+                targets: [0, 1, 8],
+                searchable: false
             }
-        });
+        ],
+
+        language: {
+            search: "Search:",
+            searchPlaceholder: "Search products...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ products",
+            zeroRecords: "No matching products found",
+            emptyTable: "No products available"
+        }
     });
+
+
+    function updateSerialNumbers() {
+
+        const info = table.page.info();
+
+        table
+            .column(0, {
+                page: "current"
+            })
+            .nodes()
+            .each(function (cell, index) {
+
+                cell.innerHTML =
+                    info.start + index + 1;
+
+            });
+    }
+
+
+    table.on(
+        "draw",
+        updateSerialNumbers
+    );
+
+    updateSerialNumbers();
+
+});
 </script>
 {% endblock %}

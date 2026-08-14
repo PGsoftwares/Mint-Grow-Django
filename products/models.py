@@ -99,6 +99,15 @@ class Product(models.Model):
 
 class ProductPriceVariation(models.Model):
 
+    UNIT_CHOICES = (
+        ("kg", "Kg"),
+        ("g", "Gram"),
+        ("pcs", "Pieces"),
+        ("bunch", "Bunch"),
+        ("pack", "Pack"),
+        ("box", "Box"),
+    )
+
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -113,6 +122,19 @@ class ProductPriceVariation(models.Model):
     price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
+    )
+
+    stock = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        help_text="Available stock quantity",
+    )
+
+    stock_unit = models.CharField(
+        max_length=20,
+        choices=UNIT_CHOICES,
+        default="kg",
     )
 
     sort_order = models.PositiveIntegerField(
@@ -137,4 +159,12 @@ class ProductPriceVariation(models.Model):
         verbose_name_plural = "Product Price Variations"
 
     def __str__(self):
-        return f"{self.product.name} - {self.name} - ₹{self.price}"
+        return (
+            f"{self.product.name} - "
+            f"{self.name} - "
+            f"₹{self.price}"
+        )
+
+    @property
+    def in_stock(self):
+        return self.stock > 0

@@ -1,19 +1,21 @@
 {% extends "layouts/site.html" %}
-
 {% load static %}
 
 {% block title %}
-    Home | Mint Grow Farm
+Home | Mint Grow Farm
 {% endblock %}
 
 {% block meta_description %}
-    Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural products.
+Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural products.
 {% endblock %}
+
 
 {% block content %}
 
 <section class="hero" id="home">
+
     <div class="container">
+
         <div class="hero-content">
 
             <div class="hero-label">
@@ -31,17 +33,27 @@
             </p>
 
             <div class="hero-buttons">
-                <a href="#products" class="primary-btn">
+
+                <a
+                    href="#products"
+                    class="primary-btn"
+                >
                     View Our Products
                 </a>
 
-                <a href="{% url 'about' %}" class="secondary-btn">
+                <a
+                    href="{% url 'about' %}"
+                    class="secondary-btn"
+                >
                     Discover Our Story
                 </a>
+
             </div>
 
         </div>
+
     </div>
+
 </section>
 
 
@@ -49,6 +61,7 @@
     class="section products-section"
     id="products"
 >
+
     <div class="container">
 
         <div class="section-header">
@@ -72,13 +85,16 @@
         <div class="home-product-controls">
 
             <div class="home-product-search">
+
                 <input
                     type="search"
                     id="productSearch"
                     placeholder="Search products..."
                     autocomplete="off"
                 >
+
             </div>
+
 
             <div class="home-category-filter">
 
@@ -100,6 +116,7 @@
 
             </div>
 
+
             <div class="home-product-length">
 
                 <select id="productPerPage">
@@ -108,7 +125,10 @@
                         5 per page
                     </option>
 
-                    <option value="10" selected>
+                    <option
+                        value="10"
+                        selected
+                    >
                         10 per page
                     </option>
 
@@ -123,6 +143,7 @@
         </div>
 
 
+        <!-- Product Table -->
         <div class="home-product-table-wrapper">
 
             <table
@@ -131,52 +152,68 @@
             >
 
                 <thead>
+
                     <tr>
 
                         <th>
                             Image
                         </th>
 
+
                         <th
                             class="sortable"
                             data-sort="name"
                         >
                             Product
+
                             <span class="sort-icon">
                                 ↕
                             </span>
                         </th>
+
 
                         <th
                             class="sortable"
                             data-sort="category"
                         >
                             Category
+
                             <span class="sort-icon">
                                 ↕
                             </span>
                         </th>
+
 
                         <th
                             class="sortable"
                             data-sort="price"
                         >
                             Variation / Price
+
                             <span class="sort-icon">
                                 ↕
                             </span>
                         </th>
 
+
+                        <th>
+                            Stock
+                        </th>
+
+
                         <th>
                             Qty
                         </th>
+
 
                         <th>
                             Add to Cart
                         </th>
 
                     </tr>
+
                 </thead>
+
 
                 <tbody id="productTableBody">
 
@@ -189,9 +226,12 @@
                             data-price="{% if product.min_price is not None %}{{ product.min_price }}{% else %}0{% endif %}"
                         >
 
+                            <!-- Image -->
                             <td>
 
-                                <a href="{% url 'public_product_detail' product.slug %}">
+                                <a
+                                    href="{% url 'public_product_detail' product.slug %}"
+                                >
 
                                     {% if product.image %}
 
@@ -215,6 +255,7 @@
                             </td>
 
 
+                            <!-- Product -->
                             <td>
 
                                 <a
@@ -235,6 +276,7 @@
                             </td>
 
 
+                            <!-- Category -->
                             <td>
 
                                 <span class="home-product-category">
@@ -248,25 +290,29 @@
 
                                 {% if variations %}
 
+                                    <!-- Variation -->
                                     <td>
 
                                         <select
                                             name="variation_id"
                                             form="cart-form-{{ product.id }}"
                                             class="home-variation-select"
+                                            data-product-id="{{ product.id }}"
                                             required
                                         >
 
                                             {% for variation in variations %}
 
-                                                <option value="{{ variation.id }}">
-
+                                                <option
+                                                    value="{{ variation.id }}"
+                                                    data-stock="{{ variation.stock }}"
+                                                    data-unit="{{ variation.get_stock_unit_display }}"
+                                                >
                                                     {% if variation.name %}
                                                         {{ variation.name }} -
                                                     {% endif %}
 
                                                     ₹{{ variation.price|floatformat:2 }}
-
                                                 </option>
 
                                             {% endfor %}
@@ -276,7 +322,34 @@
                                     </td>
 
 
+                                    <!-- Stock -->
                                     <td>
+
+                                        <span
+                                            class="home-stock-display"
+                                            id="stock-display-{{ product.id }}"
+                                        >
+                                            {% with variation=variations.0 %}
+
+                                                {% if variation.stock > 0 %}
+
+                                                    {{ variation.stock|floatformat:-2 }}
+                                                    {{ variation.get_stock_unit_display }}
+
+                                                {% else %}
+
+                                                    Out of Stock
+
+                                                {% endif %}
+
+                                            {% endwith %}
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Quantity -->
+                                    <td width="120px">
 
                                         <input
                                             type="number"
@@ -285,11 +358,13 @@
                                             value="1"
                                             min="1"
                                             class="home-quantity-input"
+                                            id="quantity-{{ product.id }}"
                                         >
 
                                     </td>
 
 
+                                    <!-- Add To Cart -->
                                     <td>
 
                                         <form
@@ -311,18 +386,32 @@
 
                                     </td>
 
+
                                 {% else %}
 
+                                    <!-- Variation -->
                                     <td>
+
                                         <span class="text-secondary">
                                             No variations
                                         </span>
+
                                     </td>
 
+
+                                    <!-- Stock -->
                                     <td>
                                         —
                                     </td>
 
+
+                                    <!-- Quantity -->
+                                    <td>
+                                        —
+                                    </td>
+
+
+                                    <!-- Add To Cart -->
                                     <td>
 
                                         <button
@@ -350,20 +439,18 @@
         </div>
 
 
-        <!-- Product Table Footer -->
+        <!-- Table Footer -->
         <div class="home-product-table-footer">
 
             <div
                 class="product-table-info"
                 id="productTableInfo"
-            >
-            </div>
+            ></div>
 
             <div
                 class="product-pagination"
                 id="productPagination"
-            >
-            </div>
+            ></div>
 
         </div>
 
@@ -380,6 +467,186 @@
         </div>
 
     </div>
+
 </section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const variationSelects = document.querySelectorAll(
+        ".home-variation-select"
+    );
+
+
+    variationSelects.forEach(function (select) {
+
+        function updateVariation() {
+
+            const productId = select.dataset.productId;
+
+            const selectedOption =
+                select.options[select.selectedIndex];
+
+            if (!selectedOption) {
+                return;
+            }
+
+
+            const stock = parseFloat(
+                selectedOption.dataset.stock || "0"
+            );
+
+            const unit =
+                selectedOption.dataset.unit || "";
+
+
+            const stockDisplay =
+                document.getElementById(
+                    "stock-display-" + productId
+                );
+
+
+            const quantityInput =
+                document.getElementById(
+                    "quantity-" + productId
+                );
+
+
+            const cartForm =
+                document.getElementById(
+                    "cart-form-" + productId
+                );
+
+
+            const cartButton = cartForm
+                ? cartForm.querySelector(
+                    ".home-add-cart-btn"
+                )
+                : null;
+
+
+            /*
+             * Stock
+             */
+            if (stockDisplay) {
+
+                if (stock > 0) {
+
+                    stockDisplay.textContent =
+                        formatStock(stock) + " " + unit;
+
+                    stockDisplay.classList.remove(
+                        "text-danger"
+                    );
+
+                    stockDisplay.classList.add(
+                        "text-success"
+                    );
+
+                } else {
+
+                    stockDisplay.textContent =
+                        "Out of Stock";
+
+                    stockDisplay.classList.remove(
+                        "text-success"
+                    );
+
+                    stockDisplay.classList.add(
+                        "text-danger"
+                    );
+                }
+
+            }
+
+
+            /*
+             * Quantity
+             */
+            if (quantityInput) {
+
+                if (stock > 0) {
+
+                    quantityInput.disabled = false;
+
+                    quantityInput.max = stock;
+
+                    const currentQuantity =
+                        parseFloat(
+                            quantityInput.value || "1"
+                        );
+
+                    if (
+                        currentQuantity > stock ||
+                        currentQuantity < 1
+                    ) {
+                        quantityInput.value = 1;
+                    }
+
+                } else {
+
+                    quantityInput.value = 1;
+                    quantityInput.disabled = true;
+                }
+
+            }
+
+
+            /*
+             * Add To Cart
+             */
+            if (cartButton) {
+
+                if (stock > 0) {
+
+                    cartButton.disabled = false;
+
+                    cartButton.textContent =
+                        "Add to Cart";
+
+                } else {
+
+                    cartButton.disabled = true;
+
+                    cartButton.textContent =
+                        "Out of Stock";
+                }
+
+            }
+
+        }
+
+
+        select.addEventListener(
+            "change",
+            updateVariation
+        );
+
+
+        updateVariation();
+
+    });
+
+
+    /*
+     * Remove unnecessary decimal zeros.
+     *
+     * 100.00 -> 100
+     * 12.50  -> 12.5
+     * 12.25  -> 12.25
+     */
+    function formatStock(value) {
+
+        return parseFloat(value.toFixed(2)).toString();
+
+    }
+
+});
+</script>
 
 {% endblock %}

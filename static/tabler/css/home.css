@@ -524,7 +524,7 @@ button {
 
 
 .home-quantity-input {
-    width: 70px;
+    width: 100px;
     height: 42px;
     padding: 8px;
     border: 1px solid #d9e2dc;
@@ -747,6 +747,65 @@ button {
     font-size: 13px;
 }
 
+/* Product quantity + cart buttons inline */
+.product-actions-inline {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.product-quantity-inline {
+    width: 145px;
+    flex-shrink: 0;
+}
+
+.product-quantity-inline .product-price-label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.product-quantity-inline .input-group {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.product-quantity-inline .form-control {
+    width: 125px;
+    min-width: 0;
+}
+
+.product-quantity-inline .input-group-text {
+    white-space: nowrap;
+    margin: 10px 0 0 10px;
+}
+
+.product-actions-inline .btn {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+
+/* Mobile */
+@media (max-width: 576px) {
+
+    .product-actions-inline {
+        gap: 10px;
+    }
+
+    .product-quantity-inline {
+        width: 130px;
+    }
+
+    .product-actions-inline .btn {
+        flex: 1;
+    }
+
+}
 
 /* =====================================================
    PRODUCT FILTERS

@@ -17,27 +17,25 @@ Checkout | Mint Grow Farm
             </h1>
 
             <p>
-                Enter your delivery information.
+                Enter your delivery information and review your order.
             </p>
 
         </div>
 
 
-        <div class="checkout-layout">
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="checkout-layout">
 
 
-            <!-- Billing / Delivery -->
+                <!-- LEFT SIDE -->
+                <div class="checkout-form-card">
 
-            <div class="checkout-form-card">
-
-                <h3>
-                    Delivery Details
-                </h3>
-
-
-                <form method="post">
-
-                    {% csrf_token %}
+                    <h3>
+                        Delivery Details
+                    </h3>
 
 
                     <div class="row">
@@ -50,7 +48,11 @@ Checkout | Mint Grow Farm
 
                             {{ form.name }}
 
-                            {{ form.name.errors }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.name.errors.0 }}
+                                </div>
+                            {% endif %}
 
                         </div>
 
@@ -63,7 +65,11 @@ Checkout | Mint Grow Farm
 
                             {{ form.phone }}
 
-                            {{ form.phone.errors }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.phone.errors.0 }}
+                                </div>
+                            {% endif %}
 
                         </div>
 
@@ -78,7 +84,11 @@ Checkout | Mint Grow Farm
 
                         {{ form.email }}
 
-                        {{ form.email.errors }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.email.errors.0 }}
+                            </div>
+                        {% endif %}
 
                     </div>
 
@@ -91,7 +101,11 @@ Checkout | Mint Grow Farm
 
                         {{ form.address }}
 
-                        {{ form.address.errors }}
+                        {% if form.address.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.address.errors.0 }}
+                            </div>
+                        {% endif %}
 
                     </div>
 
@@ -106,6 +120,12 @@ Checkout | Mint Grow Farm
 
                             {{ form.city }}
 
+                            {% if form.city.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.city.errors.0 }}
+                                </div>
+                            {% endif %}
+
                         </div>
 
 
@@ -117,6 +137,12 @@ Checkout | Mint Grow Farm
 
                             {{ form.state }}
 
+                            {% if form.state.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.state.errors.0 }}
+                                </div>
+                            {% endif %}
+
                         </div>
 
 
@@ -127,6 +153,12 @@ Checkout | Mint Grow Farm
                             </label>
 
                             {{ form.pincode }}
+
+                            {% if form.pincode.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.pincode.errors.0 }}
+                                </div>
+                            {% endif %}
 
                         </div>
 
@@ -141,84 +173,130 @@ Checkout | Mint Grow Farm
 
                         {{ form.notes }}
 
-                    </div>
-
-
-                    <div class="mb-4">
-
-                        <label class="form-label">
-                            Payment Method
-                        </label>
-
-                        {{ form.payment_method }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.notes.errors.0 }}
+                            </div>
+                        {% endif %}
 
                     </div>
 
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary w-100"
-                    >
-                        Place Order
-                    </button>
-
-                </form>
-
-            </div>
+                </div>
 
 
-            <!-- Order Summary -->
-
-            <div class="checkout-summary">
-
-                <h3>
-                    Your Order
-                </h3>
+                <!-- RIGHT SIDE -->
+                <div>
 
 
-                {% for item in cart_items %}
+                    <!-- YOUR ORDER -->
+                    <div class="checkout-summary">
 
-                    <div class="checkout-product">
+                        <h3>
+                            Your Order
+                        </h3>
 
-                        <div>
+
+                        {% for item in cart_items %}
+
+                            <div class="checkout-product">
+
+                                <div>
+
+                                    <strong>
+                                        {{ item.product.name }}
+                                    </strong>
+
+                                    <small>
+
+                                        {{ item.variation.name }}
+
+                                        <br>
+
+                                        {{ item.quantity }}
+                                        {{ item.variation.get_stock_unit_display }}
+                                        ×
+                                        ₹{{ item.price|floatformat:2 }}
+
+                                        <br>
+
+                                        {% if item.variation.stock > 0 %}
+
+                                            Available:
+                                            {{ item.variation.stock|floatformat:-2 }}
+                                            {{ item.variation.get_stock_unit_display }}
+
+                                        {% else %}
+
+                                            <span class="text-danger">
+                                                Out of Stock
+                                            </span>
+
+                                        {% endif %}
+
+                                    </small>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹{{ item.total|floatformat:2 }}
+                                </strong>
+
+                            </div>
+
+                        {% endfor %}
+
+
+                        <div class="checkout-total">
+
+                            <span>
+                                Total
+                            </span>
 
                             <strong>
-                                {{ item.product.name }}
+                                ₹{{ cart_total|floatformat:2 }}
                             </strong>
 
-                            <small>
-                                {{ item.variation.name }}
-                                ×
-                                {{ item.quantity }}
-                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <!-- PAYMENT METHOD -->
+                    <div class="checkout-summary mt-3">
+
+                        <h3>
+                            Payment Method
+                        </h3>
+
+
+                        <div class="mb-3">
+
+                            {{ form.payment_method }}
+
+                            {% if form.payment_method.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.payment_method.errors.0 }}
+                                </div>
+                            {% endif %}
 
                         </div>
 
 
-                        <strong>
-                            ₹{{ item.total|floatformat:2 }}
-                        </strong>
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+                            Place Order
+                        </button>
 
                     </div>
-
-                {% endfor %}
-
-
-                <div class="checkout-total">
-
-                    <span>
-                        Total
-                    </span>
-
-                    <strong>
-                        ₹{{ cart_total|floatformat:2 }}
-                    </strong>
 
                 </div>
 
             </div>
 
-        </div>
+        </form>
 
     </div>
 

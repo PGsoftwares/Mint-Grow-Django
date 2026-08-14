@@ -152,11 +152,11 @@
 
     <div>
         <h3 class="card-title mb-1">
-            Price Variations
+            Price & Stock Variations
         </h3>
 
         <div class="text-secondary">
-            Add grade, size, weight or quantity-based prices.
+            Add grade, size, quantity, price and available stock.
         </div>
     </div>
 
@@ -165,7 +165,7 @@
         class="btn btn-primary btn-sm"
         id="add-price-row"
     >
-        + Add Price
+        + Add Variation
     </button>
 
 </div>
@@ -190,15 +190,24 @@
                     Grade / Size / Quantity
                 </th>
 
-                <th style="width: 220px;">
+                <th style="width: 170px;">
                     Price
                 </th>
 
-                <th style="width: 100px;">
+                <th style="width: 160px;">
+                    Stock
+                </th>
+
+                <th style="width: 150px;">
+                    Unit
+                </th>
+
+                <th style="width: 80px;">
                     Action
                 </th>
             </tr>
         </thead>
+
 
         <tbody id="price-formset-body">
 
@@ -242,6 +251,32 @@
                     </td>
 
 
+                    <td>
+
+                        {{ price_form.stock }}
+
+                        {% if price_form.stock.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ price_form.stock.errors.0 }}
+                            </div>
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ price_form.stock_unit }}
+
+                        {% if price_form.stock_unit.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ price_form.stock_unit.errors.0 }}
+                            </div>
+                        {% endif %}
+
+                    </td>
+
+
                     <td class="text-center">
 
                         <div class="d-none">
@@ -251,6 +286,7 @@
                         <button
                             type="button"
                             class="btn btn-outline-danger btn-sm remove-price-row"
+                            title="Remove variation"
                         >
                             ×
                         </button>
@@ -280,6 +316,7 @@
 
         </td>
 
+
         <td>
 
             <div class="input-group">
@@ -294,6 +331,21 @@
 
         </td>
 
+
+        <td>
+
+            {{ price_formset.empty_form.stock }}
+
+        </td>
+
+
+        <td>
+
+            {{ price_formset.empty_form.stock_unit }}
+
+        </td>
+
+
         <td class="text-center">
 
             <div class="d-none">
@@ -303,6 +355,7 @@
             <button
                 type="button"
                 class="btn btn-outline-danger btn-sm remove-price-row"
+                title="Remove variation"
             >
                 ×
             </button>

@@ -91,11 +91,13 @@ def public_product_detail_view(request, slug):
     
 
 @admin_required
+@admin_required
 def product_list_view(request):
 
     products = (
         Product.objects
         .select_related("category")
+        .prefetch_related("price_variations")
         .annotate(
             min_price=Min("price_variations__price"),
             max_price=Max("price_variations__price"),

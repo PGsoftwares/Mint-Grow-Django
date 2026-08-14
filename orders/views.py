@@ -18,6 +18,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from accounts.decorators import admin_required
 
+
 @require_POST
 def cart_add(request, product_id):
 
@@ -51,7 +52,54 @@ def cart_add(request, product_id):
         product=product,
     )
 
+    if variation.stock <= 0:
+
+        messages.error(
+            request,
+            (
+                f"{product.name} - "
+                f"{variation.name} is out of stock."
+            ),
+        )
+
+        return redirect(
+            "cart_detail"
+        )
+
     cart = Cart(request)
+
+    cart_key = str(
+        variation.id
+    )
+
+    existing_quantity = 0
+
+    if cart_key in cart.cart:
+        existing_quantity = cart.cart[
+            cart_key
+        ]["quantity"]
+
+    requested_total = (
+        existing_quantity + quantity
+    )
+
+    if requested_total > variation.stock:
+
+        messages.error(
+            request,
+            (
+                f"Only "
+                f"{variation.stock.normalize()} "
+                f"{variation.get_stock_unit_display()} "
+                f"available for "
+                f"{product.name} - "
+                f"{variation.name}."
+            ),
+        )
+
+        return redirect(
+            "cart_detail"
+        )
 
     cart.add(
         product=product,
@@ -61,7 +109,7 @@ def cart_add(request, product_id):
 
     messages.success(
         request,
-        f"{product.name} added to cart."
+        f"{product.name} added to cart.",
     )
 
     return redirect(
@@ -130,6 +178,11 @@ def cart_update(request, variation_id):
 
     cart = Cart(request)
 
+    variation = get_object_or_404(
+        ProductPriceVariation,
+        id=variation_id,
+    )
+
     quantity = request.POST.get(
         "quantity",
         1,
@@ -145,21 +198,50 @@ def cart_update(request, variation_id):
         variation_id
     )
 
-    if cart_key in cart.cart:
+    if cart_key not in cart.cart:
+        return redirect(
+            "cart_detail"
+        )
 
-        if quantity <= 0:
+    if quantity <= 0:
 
-            cart.remove(
-                variation_id
-            )
+        cart.remove(
+            variation_id
+        )
 
-        else:
+        return redirect(
+            "cart_detail"
+        )
 
-            cart.cart[
-                cart_key
-            ]["quantity"] = quantity
+    # Check available stock
+    if quantity > variation.stock:
 
-            cart.save()
+        messages.error(
+            request,
+            (
+                f"Only "
+                f"{variation.stock.normalize()} "
+                f"{variation.get_stock_unit_display()} "
+                f"available for "
+                f"{variation.product.name} - "
+                f"{variation.name}."
+            ),
+        )
+
+        return redirect(
+            "cart_detail"
+        )
+
+    cart.cart[
+        cart_key
+    ]["quantity"] = quantity
+
+    cart.save()
+
+    messages.success(
+        request,
+        "Cart updated successfully.",
+    )
 
     return redirect(
         "cart_detail"
@@ -193,7 +275,7 @@ def checkout(request):
 
         messages.error(
             request,
-            "Your cart is empty."
+            "Your cart is empty.",
         )
 
         return redirect(
@@ -211,17 +293,18 @@ def checkout(request):
             status="active",
         ).first()
 
+        if not product:
+            continue
+
         variation = ProductPriceVariation.objects.filter(
             id=item["variation_id"],
             product=product,
         ).first()
 
-        if not product or not variation:
+        if not variation:
             continue
 
-        # Always use current database price
         price = variation.price
-
         quantity = item["quantity"]
 
         item_total = (
@@ -244,12 +327,13 @@ def checkout(request):
 
         messages.error(
             request,
-            "Your cart does not contain valid products."
+            "Your cart does not contain valid products.",
         )
 
         return redirect(
             "public_product_list"
         )
+
 
     if request.method == "POST":
 
@@ -259,53 +343,142 @@ def checkout(request):
 
         if form.is_valid():
 
-            with transaction.atomic():
+            try:
 
-                order = form.save(
-                    commit=False
-                )
+                with transaction.atomic():
 
-                order.total_amount = total
+                    locked_items = []
 
-                order.save()
-
-                for item in cart_items:
-
-                    OrderItem.objects.create(
-
-                        order=order,
-
-                        product=item[
-                            "product"
-                        ],
-
-                        product_name=item[
-                            "product"
-                        ].name,
-
-                        variation_name=item[
-                            "variation"
-                        ].name,
-
-                        price=item[
-                            "price"
-                        ],
-
-                        quantity=item[
-                            "quantity"
-                        ],
-
-                        total=item[
-                            "total"
-                        ],
+                    total = Decimal(
+                        "0.00"
                     )
 
-                cart.clear()
+                    # Re-check and lock stock
+                    for item in cart_items:
 
-            return redirect(
-                "order_success",
-                order_number=order.order_number,
-            )
+                        variation = (
+                            ProductPriceVariation.objects
+                            .select_for_update()
+                            .get(
+                                id=item[
+                                    "variation"
+                                ].id
+                            )
+                        )
+
+                        quantity = item[
+                            "quantity"
+                        ]
+
+                        if variation.stock <= 0:
+
+                            raise ValueError(
+                                (
+                                    f"{variation.product.name} - "
+                                    f"{variation.name} "
+                                    f"is out of stock."
+                                )
+                            )
+
+                        if quantity > variation.stock:
+
+                            raise ValueError(
+                                (
+                                    f"Only "
+                                    f"{variation.stock.normalize()} "
+                                    f"{variation.get_stock_unit_display()} "
+                                    f"available for "
+                                    f"{variation.product.name} - "
+                                    f"{variation.name}."
+                                )
+                            )
+
+                        # Always use current price
+                        price = variation.price
+
+                        item_total = (
+                            price * quantity
+                        )
+
+                        total += item_total
+
+                        locked_items.append(
+                            {
+                                "product": variation.product,
+                                "variation": variation,
+                                "price": price,
+                                "quantity": quantity,
+                                "total": item_total,
+                            }
+                        )
+
+
+                    # Create order
+                    order = form.save(
+                        commit=False
+                    )
+
+                    order.total_amount = total
+
+                    order.save()
+
+
+                    # Create order items
+                    for item in locked_items:
+
+                        OrderItem.objects.create(
+                            order=order,
+                            product=item["product"],
+                            product_name=item["product"].name,
+                            variation_name=item["variation"].name,
+                            unit=item["variation"].stock_unit,
+                            price=item["price"],
+                            quantity=item["quantity"],
+                            total=item["total"],
+                        )
+
+
+                        # Reduce stock
+                        variation = item[
+                            "variation"
+                        ]
+
+                        variation.stock -= item[
+                            "quantity"
+                        ]
+
+                        variation.save(
+                            update_fields=[
+                                "stock",
+                                "updated_at",
+                            ]
+                        )
+
+
+                    cart.clear()
+
+
+                messages.success(
+                    request,
+                    "Order placed successfully.",
+                )
+
+                return redirect(
+                    "order_success",
+                    order_number=order.order_number,
+                )
+
+
+            except ValueError as error:
+
+                messages.error(
+                    request,
+                    str(error),
+                )
+
+                return redirect(
+                    "cart_detail"
+                )
 
     else:
 
@@ -322,6 +495,7 @@ def checkout(request):
         form = CheckoutForm(
             initial=initial
         )
+
 
     context = {
         "form": form,

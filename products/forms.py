@@ -168,9 +168,7 @@ class ProductForm(forms.ModelForm):
         return image
 
 
-class ProductPriceVariationForm(
-    forms.ModelForm
-):
+class ProductPriceVariationForm(forms.ModelForm):
 
     class Meta:
 
@@ -179,6 +177,8 @@ class ProductPriceVariationForm(
         fields = [
             "name",
             "price",
+            "stock",
+            "stock_unit",
         ]
 
         widgets = {
@@ -186,17 +186,32 @@ class ProductPriceVariationForm(
                 attrs={
                     "class": "form-control",
                     "placeholder": (
-                        "Example: A Grade, 1 KG, "
-                        "Small Size"
+                        "Example: A Grade, 1 KG, Small Size"
                     ),
                 }
             ),
+
             "price": forms.NumberInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "0.00",
                     "min": "0",
                     "step": "0.01",
+                }
+            ),
+
+            "stock": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "0",
+                    "min": "0",
+                    "step": "0.01",
+                }
+            ),
+
+            "stock_unit": forms.Select(
+                attrs={
+                    "class": "form-select",
                 }
             ),
         }
@@ -207,9 +222,6 @@ class ProductPriceVariationForm(
             "name",
             ""
         ).strip()
-
-        if not name:
-            return name
 
         return name
 
@@ -226,13 +238,25 @@ class ProductPriceVariationForm(
 
         return price
 
+    def clean_stock(self):
 
+        stock = self.cleaned_data.get(
+            "stock"
+        )
+
+        if stock is not None and stock < 0:
+            raise ValidationError(
+                "Stock cannot be negative."
+            )
+
+        return stock
+    
 ProductPriceVariationFormSet = (
     inlineformset_factory(
         Product,
         ProductPriceVariation,
         form=ProductPriceVariationForm,
-        extra=3,
+        extra=1,
         can_delete=True,
     )
 )

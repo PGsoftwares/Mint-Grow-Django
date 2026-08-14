@@ -104,25 +104,55 @@ document.addEventListener("DOMContentLoaded", function () {
     const addButton = document.getElementById("add-price-row");
     const tableBody = document.getElementById("price-formset-body");
     const template = document.getElementById("empty-price-form-template");
+    const totalForms = document.getElementById(
+        "id_price_variations-TOTAL_FORMS"
+    );
 
-    if (!addButton || !tableBody || !template) {
-        console.error("Price variation elements are missing.");
+    if (!addButton || !tableBody || !template || !totalForms) {
+        console.error("Price variation formset elements not found.");
         return;
     }
 
-    const totalForms = document.querySelector(
-        'input[name$="-TOTAL_FORMS"]'
-    );
 
-    if (!totalForms) {
-        console.error("TOTAL_FORMS input not found.");
-        return;
+    function reindexRows() {
+
+        const rows = tableBody.querySelectorAll(
+            ".price-form-row"
+        );
+
+        rows.forEach(function (row, index) {
+
+            row.querySelectorAll(
+                "input, select, textarea, label"
+            ).forEach(function (element) {
+
+                if (element.name) {
+                    element.name = element.name.replace(
+                        /price_variations-\d+-/,
+                        `price_variations-${index}-`
+                    );
+                }
+
+                if (element.id) {
+                    element.id = element.id.replace(
+                        /price_variations-\d+-/,
+                        `price_variations-${index}-`
+                    );
+                }
+
+                if (element.htmlFor) {
+                    element.htmlFor = element.htmlFor.replace(
+                        /price_variations-\d+-/,
+                        `price_variations-${index}-`
+                    );
+                }
+
+            });
+
+        });
+
+        totalForms.value = rows.length;
     }
-
-    const prefix = totalForms.name.replace(
-        "-TOTAL_FORMS",
-        ""
-    );
 
 
     function bindRemoveButton(button) {
@@ -143,7 +173,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 'input[name$="-DELETE"]'
             );
 
-            // Existing saved row
+
+            // Existing saved variation
             if (
                 idInput &&
                 idInput.value &&
@@ -154,8 +185,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // New unsaved row
+
+            // New unsaved variation
             row.remove();
+
+            reindexRows();
         });
     }
 
@@ -167,9 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
             10
         );
 
-        let newFormHtml = template.innerHTML;
-
-        newFormHtml = newFormHtml.replaceAll(
+        const newFormHtml = template.innerHTML.replaceAll(
             "__prefix__",
             formIndex
         );
@@ -196,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const nameInput = newRow.querySelector(
-            `input[name="${prefix}-${formIndex}-name"]`
+            `input[name="price_variations-${formIndex}-name"]`
         );
 
         if (nameInput) {

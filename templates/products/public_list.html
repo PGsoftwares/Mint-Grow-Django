@@ -156,11 +156,13 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                             </span>
                         </th>
 
+                        <th>
+                            Stock
+                        </th>
 
                         <th>
                             Qty
                         </th>
-
 
                         <th>
                             Add to Cart
@@ -212,7 +214,7 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
 
 
                             <!-- Product -->
-                            <td>
+                            <td style="max-width: 200px;">
 
                                 <a
                                     href="{% url 'public_product_detail' product.slug %}"
@@ -266,19 +268,19 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                                             name="variation_id"
                                             form="cart-form-{{ product.id }}"
                                             class="home-variation-select"
+                                            data-product-id="{{ product.id }}"
                                             required
                                         >
-
                                             {% for variation in variations %}
 
                                                 <option
                                                     value="{{ variation.id }}"
+                                                    data-stock="{{ variation.stock }}"
+                                                    data-unit="{{ variation.get_stock_unit_display }}"
                                                 >
 
                                                     {% if variation.name %}
-
                                                         {{ variation.name }} -
-
                                                     {% endif %}
 
                                                     ₹{{ variation.price|floatformat:2 }}
@@ -286,11 +288,33 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                                                 </option>
 
                                             {% endfor %}
-
                                         </select>
 
                                     </td>
 
+                                    <td>
+
+                                        <span
+                                            class="home-stock-display"
+                                            id="stock-display-{{ product.id }}"
+                                        >
+                                            {% with variation=variations.0 %}
+
+                                                {% if variation.stock > 0 %}
+
+                                                    {{ variation.stock|floatformat:-2 }}
+                                                    {{ variation.get_stock_unit_display }}
+
+                                                {% else %}
+
+                                                    Out of Stock
+
+                                                {% endif %}
+
+                                            {% endwith %}
+                                        </span>
+
+                                    </td>
 
                                     <!-- Quantity -->
                                     <td>
@@ -302,10 +326,10 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                                             value="1"
                                             min="1"
                                             class="home-quantity-input"
+                                            id="quantity-{{ product.id }}"
                                         >
 
                                     </td>
-
 
                                     <!-- Cart -->
                                     <td>
@@ -333,18 +357,18 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                                 {% else %}
 
                                     <td>
-
                                         <span class="text-secondary">
                                             No variations
                                         </span>
-
                                     </td>
-
 
                                     <td>
                                         —
                                     </td>
 
+                                    <td>
+                                        —
+                                    </td>
 
                                     <td>
 
@@ -370,7 +394,7 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
                         <tr>
 
                             <td
-                                colspan="6"
+                                colspan="7"
                                 class="home-product-empty"
                             >
                                 No products are currently available.
@@ -407,5 +431,147 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
 
     </div>
 </section>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const variationSelects = document.querySelectorAll(
+        ".home-variation-select"
+    );
+
+    variationSelects.forEach(function (select) {
+
+        function updateVariation() {
+
+            const productId = select.dataset.productId;
+
+            const selectedOption =
+                select.options[select.selectedIndex];
+
+            if (!selectedOption) {
+                return;
+            }
+
+            const stock = parseFloat(
+                selectedOption.dataset.stock || "0"
+            );
+
+            const unit =
+                selectedOption.dataset.unit || "";
+
+            const stockDisplay =
+                document.getElementById(
+                    "stock-display-" + productId
+                );
+
+            const quantityInput =
+                document.getElementById(
+                    "quantity-" + productId
+                );
+
+            const cartForm =
+                document.getElementById(
+                    "cart-form-" + productId
+                );
+
+            const cartButton = cartForm
+                ? cartForm.querySelector(
+                    ".home-add-cart-btn"
+                )
+                : null;
+
+
+            if (stockDisplay) {
+
+                if (stock > 0) {
+
+                    stockDisplay.textContent =
+                        formatStock(stock) + " " + unit;
+
+                    stockDisplay.classList.remove(
+                        "text-danger"
+                    );
+
+                    stockDisplay.classList.add(
+                        "text-success"
+                    );
+
+                } else {
+
+                    stockDisplay.textContent =
+                        "Out of Stock";
+
+                    stockDisplay.classList.remove(
+                        "text-success"
+                    );
+
+                    stockDisplay.classList.add(
+                        "text-danger"
+                    );
+                }
+            }
+
+
+            if (quantityInput) {
+
+                if (stock > 0) {
+
+                    quantityInput.disabled = false;
+                    quantityInput.max = stock;
+
+                    const quantity = parseFloat(
+                        quantityInput.value || "1"
+                    );
+
+                    if (
+                        quantity > stock ||
+                        quantity < 1
+                    ) {
+                        quantityInput.value = 1;
+                    }
+
+                } else {
+
+                    quantityInput.value = 1;
+                    quantityInput.disabled = true;
+                }
+            }
+
+
+            if (cartButton) {
+
+                cartButton.disabled = stock <= 0;
+
+                cartButton.textContent =
+                    stock > 0
+                        ? "Add to Cart"
+                        : "Out of Stock";
+            }
+
+        }
+
+
+        select.addEventListener(
+            "change",
+            updateVariation
+        );
+
+        updateVariation();
+
+    });
+
+
+    function formatStock(value) {
+        return parseFloat(
+            value.toFixed(2)
+        ).toString();
+    }
+
+});
+</script>
 
 {% endblock %}
