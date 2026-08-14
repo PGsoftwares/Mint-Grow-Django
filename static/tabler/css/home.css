@@ -428,6 +428,27 @@ button {
     font-weight: 600;
 }
 
+.home-stock-badge {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.home-stock-badge.in-stock {
+    background: #edf6ef;
+    color: #347642;
+}
+.home-stock-display{
+    display: inline-grid;
+}
+
+.home-stock-badge.out-of-stock {
+    background: #fdecec;
+    color: #c0392b;
+}
 
 /* Price */
 

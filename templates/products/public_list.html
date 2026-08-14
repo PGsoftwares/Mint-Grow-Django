@@ -292,28 +292,35 @@ Explore fresh, traceable and responsibly sourced agricultural products from Mint
 
                                     </td>
 
-                                    <td>
-
+                                    <!-- Stock -->
+                                    <td style="text-align: center;">
                                         <span
                                             class="home-stock-display"
                                             id="stock-display-{{ product.id }}"
                                         >
                                             {% with variation=variations.0 %}
 
-                                                {% if variation.stock > 0 %}
-
+                                                <strong class="d-block">
                                                     {{ variation.stock|floatformat:-2 }}
                                                     {{ variation.get_stock_unit_display }}
+                                                </strong>
+
+                                                {% if variation.stock > 0 %}
+
+                                                    <span class="home-stock-badge in-stock">
+                                                        In Stock
+                                                    </span>
 
                                                 {% else %}
 
-                                                    Out of Stock
+                                                    <span class="home-stock-badge out-of-stock">
+                                                        Out of Stock
+                                                    </span>
 
                                                 {% endif %}
 
                                             {% endwith %}
                                         </span>
-
                                     </td>
 
                                     <!-- Quantity -->
@@ -485,34 +492,32 @@ document.addEventListener("DOMContentLoaded", function () {
                 : null;
 
 
-            if (stockDisplay) {
+            if (quantityInput) {
 
                 if (stock > 0) {
 
-                    stockDisplay.textContent =
-                        formatStock(stock) + " " + unit;
+                    quantityInput.disabled = false;
 
-                    stockDisplay.classList.remove(
-                        "text-danger"
-                    );
+                    quantityInput.max = stock;
 
-                    stockDisplay.classList.add(
-                        "text-success"
-                    );
+                    const currentQuantity =
+                        parseFloat(
+                            quantityInput.value || "1"
+                        );
+
+                    if (
+                        currentQuantity > stock ||
+                        currentQuantity < 1
+                    ) {
+                        quantityInput.value = 1;
+                    }
 
                 } else {
 
-                    stockDisplay.textContent =
-                        "Out of Stock";
-
-                    stockDisplay.classList.remove(
-                        "text-success"
-                    );
-
-                    stockDisplay.classList.add(
-                        "text-danger"
-                    );
+                    quantityInput.value = 1;
+                    quantityInput.disabled = true;
                 }
+
             }
 
 
