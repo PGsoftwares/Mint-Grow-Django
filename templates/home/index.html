@@ -207,7 +207,11 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
 
                         <th>
-                            Add to Cart
+                            Add to cart
+                        </th>
+
+                        <th>
+                            Enquiry
                         </th>
 
                     </tr>
@@ -354,7 +358,7 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
 
                                     <!-- Quantity -->
-                                    <td width="120px">
+                                    <td width="90px">
 
                                         <input
                                             type="number"
@@ -368,8 +372,7 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
                                     </td>
 
-
-                                    <!-- Add To Cart -->
+                                    <!-- Cart -->
                                     <td>
 
                                         <form
@@ -388,6 +391,17 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
                                             </button>
 
                                         </form>
+
+                                    </td>
+
+                                    <td>
+
+                                        <a
+                                            href="{% url 'product_enquiry' product.slug %}"
+                                            class="home-add-cart-btn"
+                                        >
+                                            Enquire Now
+                                        </a>
 
                                     </td>
 
