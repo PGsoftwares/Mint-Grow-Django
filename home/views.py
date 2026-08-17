@@ -17,7 +17,7 @@ def home_view(request):
             status="active",
             parent__isnull=True,
         )
-        .order_by("name")
+        .order_by("name") 
     )
 
 
