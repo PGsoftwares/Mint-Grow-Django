@@ -1,0 +1,411 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+    Enquiry Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-print-none">
+
+    <div class="row g-2 align-items-center">
+
+        <div class="col">
+
+            <div class="page-pretitle">
+                Enquiry Management
+            </div>
+
+            <h2 class="page-title">
+                Enquiry Details
+            </h2>
+
+        </div>
+
+        <div class="col-auto ms-auto">
+
+            <a
+                href="{% url 'enquiry_list' %}"
+                class="btn btn-outline-secondary"
+            >
+                Back to Enquiries
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="row row-cards mt-3">
+
+    <!-- Customer Details -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h3 class="card-title">
+                    Customer Details
+                </h3>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-4">
+                        Name
+                    </dt>
+
+                    <dd class="col-sm-8">
+                        {{ enquiry.name }}
+                    </dd>
+
+
+                    <dt class="col-sm-4">
+                        Email
+                    </dt>
+
+                    <dd class="col-sm-8">
+
+                        {% if enquiry.email %}
+
+                            <a href="mailto:{{ enquiry.email }}">
+                                {{ enquiry.email }}
+                            </a>
+
+                        {% else %}
+
+                            <span class="text-secondary">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+
+                    <dt class="col-sm-4">
+                        Phone
+                    </dt>
+
+                    <dd class="col-sm-8">
+
+                        {% if enquiry.phone %}
+
+                            <a href="tel:{{ enquiry.phone }}">
+                                {{ enquiry.phone }}
+                            </a>
+
+                        {% else %}
+
+                            <span class="text-secondary">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Product Details -->
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h3 class="card-title">
+                    Product Details
+                </h3>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-4">
+                        Product
+                    </dt>
+
+                    <dd class="col-sm-8">
+
+                        <strong>
+                            {{ enquiry.product.name }}
+                        </strong>
+
+                    </dd>
+
+
+                    <dt class="col-sm-4">
+                        Category
+                    </dt>
+
+                    <dd class="col-sm-8">
+
+                        {% if enquiry.product.category %}
+
+                            <span class="badge bg-blue-lt">
+                                {{ enquiry.product.category.name }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-secondary">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+
+                    <dt class="col-sm-4">
+                        Variation
+                    </dt>
+
+                    <dd class="col-sm-8">
+
+                        {% if enquiry.variation %}
+
+                            <strong>
+                                {{ enquiry.variation.name }}
+                            </strong>
+
+                            <div class="text-secondary small">
+
+                                ₹{{ enquiry.variation.price|floatformat:2 }}
+
+                            </div>
+
+                        {% else %}
+
+                            <span class="text-secondary">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+
+                    <dt class="col-sm-4">
+                        Quantity
+                    </dt>
+
+                    <dd class="col-sm-8">
+
+                        {% if enquiry.quantity %}
+
+                            {{ enquiry.quantity|floatformat:-2 }}
+
+                            {% if enquiry.variation %}
+
+                                {{ enquiry.variation.get_stock_unit_display }}
+
+                            {% endif %}
+
+                        {% else %}
+
+                            <span class="text-secondary">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Enquiry Information -->
+
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h3 class="card-title">
+                    Enquiry Information
+                </h3>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-md-2">
+                        Status
+                    </dt>
+
+                    <dd class="col-md-10">
+
+                        {% if enquiry.status == "new" %}
+
+                            <span class="badge bg-blue-lt">
+                                New
+                            </span>
+
+                        {% elif enquiry.status == "contacted" %}
+
+                            <span class="badge bg-yellow-lt">
+                                Contacted
+                            </span>
+
+                        {% elif enquiry.status == "closed" %}
+
+                            <span class="badge bg-green-lt">
+                                Closed
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary-lt">
+                                {{ enquiry.status|title }}
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+
+                    <dt class="col-md-2">
+                        Submitted
+                    </dt>
+
+                    <dd class="col-md-10">
+
+                        {{ enquiry.created_at|date:"d M Y, h:i A" }}
+
+                    </dd>
+
+
+                    <dt class="col-md-2">
+                        Message
+                    </dt>
+
+                    <dd class="col-md-10">
+
+                        {% if enquiry.message %}
+
+                            <div class="border rounded p-3 bg-light">
+
+                                {{ enquiry.message|linebreaksbr }}
+
+                            </div>
+
+                        {% else %}
+
+                            <span class="text-secondary">
+                                No message provided.
+                            </span>
+
+                        {% endif %}
+
+                    </dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Actions -->
+
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="d-flex gap-2">
+
+                    {% if enquiry.status == "new" %}
+
+                        <form
+                            method="post"
+                            action="{% url 'enquiry_mark_contacted' enquiry.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-warning"
+                            >
+                                Mark as Contacted
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+
+                    {% if enquiry.status != "closed" %}
+
+                        <form
+                            method="post"
+                            action="{% url 'enquiry_mark_closed' enquiry.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-success"
+                            >
+                                Mark as Closed
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+
+                    <a
+                        href="{% url 'enquiry_list' %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        Back
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

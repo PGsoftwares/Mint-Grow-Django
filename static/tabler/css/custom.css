@@ -2,7 +2,9 @@
     padding-left: 15px !important;
 }
 
-
+.navbar .navbar-nav .nav-link .badge{
+    margin: 1rem !important;
+}
 
 /* DataTables */
 

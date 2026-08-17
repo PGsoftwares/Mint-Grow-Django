@@ -1,0 +1,247 @@
+{% extends "layouts/site.html" %}
+
+{% block title %}
+Enquire About {{ product.name }} | Mint Grow Farm
+{% endblock %}
+
+{% block meta_description %}
+Send an enquiry about {{ product.name }} from Mint Grow Farm.
+{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+
+    <div class="container">
+
+        <h1>
+            Enquire About This Product
+        </h1>
+
+        <p>
+            Send us your requirements and our team will contact you.
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <h2 class="section-title">
+                {{ product.name }}
+            </h2>
+
+            {% if product.short_description %}
+
+                <p class="section-description">
+                    {{ product.short_description }}
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <form
+            method="post"
+            class="product-enquiry-form"
+        >
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+
+            <div class="form-group">
+
+                <label for="{{ form.name.id_for_label }}">
+                    Name
+                </label>
+
+                {{ form.name }}
+
+                {{ form.name.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email
+                </label>
+
+                {{ form.email }}
+
+                {{ form.email.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.phone.id_for_label }}">
+                    Phone
+                </label>
+
+                {{ form.phone }}
+
+                {{ form.phone.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.variation.id_for_label }}">
+                    Variation
+                </label>
+
+                {{ form.variation }}
+
+                {{ form.variation.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.quantity.id_for_label }}">
+                    Quantity
+                </label>
+
+                {{ form.quantity }}
+
+                {{ form.quantity.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.message.id_for_label }}">
+                    Message
+                </label>
+
+                {{ form.message }}
+
+                {{ form.message.errors }}
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="home-add-cart-btn"
+            >
+                Send Enquiry
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+{% if enquiry_success %}
+
+<div
+    class="enquiry-success-overlay"
+    id="enquirySuccessModal"
+>
+
+    <div class="enquiry-success-modal">
+
+        <div class="enquiry-success-icon">
+            ✓
+        </div>
+
+        <h2>
+            Enquiry Submitted!
+        </h2>
+
+        <p>
+            Thank you for your enquiry about
+            <strong>{{ product.name }}</strong>.
+        </p>
+
+        <p>
+            Our team will contact you shortly.
+        </p>
+
+        <a
+            href="{% url 'public_product_list' %}"
+            class="home-add-cart-btn"
+        >
+            Close
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<style>
+
+.enquiry-success-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.enquiry-success-modal {
+    width: 100%;
+    max-width: 450px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.enquiry-success-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #edf6ef;
+    color: #347642;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.enquiry-success-modal h2 {
+    margin-bottom: 12px;
+}
+
+.enquiry-success-modal p {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.enquiry-success-modal .home-add-cart-btn {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+}
+
+</style>
+
+{% endblock %}
