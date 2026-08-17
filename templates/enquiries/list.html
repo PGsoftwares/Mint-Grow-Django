@@ -96,35 +96,21 @@
 
                     <tr>
 
-                        <!-- S.No -->
-
                         <td class="text-secondary serial-number"></td>
 
-
-                        <!-- Product -->
-
                         <td>
-
                             <div class="fw-bold">
                                 {{ enquiry.product.name }}
                             </div>
 
                             {% if enquiry.product.category %}
-
                                 <div class="mt-1">
-
                                     <span class="badge bg-blue-lt">
                                         {{ enquiry.product.category.name }}
                                     </span>
-
                                 </div>
-
                             {% endif %}
-
                         </td>
-
-
-                        <!-- Customer -->
 
                         <td>
 
@@ -133,36 +119,22 @@
                             </div>
 
                             {% if enquiry.email %}
-
                                 <div class="text-secondary small mt-1">
                                     {{ enquiry.email }}
                                 </div>
-
                             {% endif %}
 
                         </td>
-
-
-                        <!-- Phone -->
 
                         <td>
 
                             {% if enquiry.phone %}
-
                                 {{ enquiry.phone }}
-
                             {% else %}
-
-                                <span class="text-secondary">
-                                    —
-                                </span>
-
+                                <span class="text-secondary">—</span>
                             {% endif %}
 
                         </td>
-
-
-                        <!-- Variation -->
 
                         <td>
 
@@ -173,9 +145,7 @@
                                 </div>
 
                                 <div class="text-secondary small">
-
                                     ₹{{ enquiry.variation.price|floatformat:2 }}
-
                                 </div>
 
                             {% else %}
@@ -188,9 +158,6 @@
 
                         </td>
 
-
-                        <!-- Quantity -->
-
                         <td>
 
                             {% if enquiry.quantity %}
@@ -198,9 +165,7 @@
                                 {{ enquiry.quantity|floatformat:-2 }}
 
                                 {% if enquiry.variation %}
-
                                     {{ enquiry.variation.get_stock_unit_display }}
-
                                 {% endif %}
 
                             {% else %}
@@ -212,9 +177,6 @@
                             {% endif %}
 
                         </td>
-
-
-                        <!-- Status -->
 
                         <td>
 
@@ -246,9 +208,6 @@
 
                         </td>
 
-
-                        <!-- Date -->
-
                         <td>
 
                             <div>
@@ -261,31 +220,11 @@
 
                         </td>
 
-
-                        <!-- Actions -->
-
                         <td class="text-end">
 
                             {% url "enquiry_detail" enquiry.id as view_url %}
 
                             {% include "partials/action_dropdown.html" with edit_url=view_url item_status=enquiry.status show_toggle=False show_delete=False %}
-
-                        </td>
-
-                    </tr>
-
-                {% empty %}
-
-                    <tr>
-
-                        <td
-                            colspan="9"
-                            class="text-center py-5"
-                        >
-
-                            <div class="text-secondary">
-                                No enquiries available.
-                            </div>
 
                         </td>
 
