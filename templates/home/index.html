@@ -12,47 +12,222 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
 {% block content %}
 
-<section class="hero" id="home">
+<section
+    class="hero hero-slider"
+    id="home"
+>
 
-    <div class="container">
+    {% if hero_sliders %}
 
-        <div class="hero-content">
+        <div class="hero-slides">
 
-            <div class="hero-label">
-                🌱 Farmer-led integrated food company
+            {% for slider in hero_sliders %}
+
+                <div
+                    class="hero-slide {% if forloop.first %}active{% endif %}"
+                    data-slide="{{ forloop.counter0 }}"
+                >
+
+                    {% if slider.image %}
+
+                        <picture class="hero-slide-image">
+
+                            {% if slider.mobile_image %}
+
+                                <source
+                                    media="(max-width: 768px)"
+                                    srcset="{{ slider.mobile_image.url }}"
+                                >
+
+                            {% endif %}
+
+                            <img
+                                src="{{ slider.image.url }}"
+                                alt="{{ slider.title }}"
+                                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                            >
+
+                        </picture>
+
+                    {% endif %}
+
+
+                    <div class="hero-overlay"></div>
+
+
+                    <div class="container">
+
+                        <div class="hero-content">
+
+                            {% if slider.label %}
+
+                                <div class="hero-label">
+                                    {{ slider.label }}
+                                </div>
+
+                            {% endif %}
+
+
+                            {% if slider.title or slider.highlight_text %}
+
+                                <h1>
+
+                                    {% if slider.title %}
+                                        {{ slider.title }}
+                                    {% endif %}
+
+                                    {% if slider.highlight_text %}
+
+                                        <span>
+                                            {{ slider.highlight_text }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </h1>
+
+                            {% endif %}
+
+
+                            {% if slider.description %}
+
+                                <p>
+                                    {{ slider.description }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if slider.button1_text or slider.button2_text %}
+
+                                <div class="hero-buttons">
+
+                                    {% if slider.button1_text and slider.button1_url %}
+
+                                        <a
+                                            href="{{ slider.button1_url }}"
+                                            class="primary-btn"
+                                        >
+                                            {{ slider.button1_text }}
+                                        </a>
+
+                                    {% endif %}
+
+
+                                    {% if slider.button2_text and slider.button2_url %}
+
+                                        <a
+                                            href="{{ slider.button2_url }}"
+                                            class="secondary-btn"
+                                        >
+                                            {{ slider.button2_text }}
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% if hero_sliders|length > 1 %}
+
+            <button
+                type="button"
+                class="hero-slider-prev"
+                aria-label="Previous slide"
+            >
+                &#10094;
+            </button>
+
+
+            <button
+                type="button"
+                class="hero-slider-next"
+                aria-label="Next slide"
+            >
+                &#10095;
+            </button>
+
+
+            <div class="hero-slider-dots">
+
+                {% for slider in hero_sliders %}
+
+                    <button
+                        type="button"
+                        class="hero-slider-dot {% if forloop.first %}active{% endif %}"
+                        data-slide="{{ forloop.counter0 }}"
+                        aria-label="Go to slide {{ forloop.counter }}"
+                    ></button>
+
+                {% endfor %}
+
             </div>
 
-            <h1>
-                Fresh produce from
-                <span>farm to future.</span>
-            </h1>
+        {% endif %}
 
-            <p>
-                We connect farmers, technology and markets to deliver safe,
-                traceable and high-quality agricultural products.
-            </p>
 
-            <div class="hero-buttons">
+    {% else %}
 
-                <a
-                    href="#products"
-                    class="primary-btn"
-                >
-                    View Our Products
-                </a>
+        <!-- Fallback when no active slider exists -->
 
-                <a
-                    href="{% url 'about' %}"
-                    class="secondary-btn"
-                >
-                    Discover Our Story
-                </a>
+        <div class="hero-slide active">
+
+            <div class="container">
+
+                <div class="hero-content">
+
+                    <div class="hero-label">
+                        🌱 Farmer-led integrated food company
+                    </div>
+
+                    <h1>
+                        Fresh produce from
+                        <span>farm to future.</span>
+                    </h1>
+
+                    <p>
+                        We connect farmers, technology and markets
+                        to deliver safe, traceable and high-quality
+                        agricultural products.
+                    </p>
+
+                    <div class="hero-buttons">
+
+                        <a
+                            href="#products"
+                            class="primary-btn"
+                        >
+                            View Our Products
+                        </a>
+
+                        <a
+                            href="{% url 'about' %}"
+                            class="secondary-btn"
+                        >
+                            Discover Our Story
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+    {% endif %}
 
 </section>
 
@@ -663,6 +838,152 @@ document.addEventListener("DOMContentLoaded", function () {
         return parseFloat(value.toFixed(2)).toString();
 
     }
+
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const slides = document.querySelectorAll(".hero-slide");
+    const dots = document.querySelectorAll(".hero-slider-dot");
+
+    const previousButton = document.querySelector(".hero-slider-prev");
+    const nextButton = document.querySelector(".hero-slider-next");
+
+    console.log("Hero slides:", slides.length);
+
+
+    if (slides.length <= 1) {
+        console.log("Only one hero slide found.");
+        return;
+    }
+
+
+    let currentSlide = 0;
+    let sliderInterval;
+
+
+    function showSlide(index) {
+
+        if (index >= slides.length) {
+            index = 0;
+        }
+
+        if (index < 0) {
+            index = slides.length - 1;
+        }
+
+
+        slides.forEach(function (slide, slideIndex) {
+
+            slide.classList.toggle(
+                "active",
+                slideIndex === index
+            );
+
+        });
+
+
+        dots.forEach(function (dot, dotIndex) {
+
+            dot.classList.toggle(
+                "active",
+                dotIndex === index
+            );
+
+        });
+
+
+        currentSlide = index;
+
+        console.log("Showing slide:", index);
+    }
+
+
+    function nextSlide() {
+
+        showSlide(currentSlide + 1);
+
+    }
+
+
+    function previousSlide() {
+
+        showSlide(currentSlide - 1);
+
+    }
+
+
+    function startAutoSlide() {
+
+        clearInterval(sliderInterval);
+
+        sliderInterval = setInterval(
+            nextSlide,
+            5000
+        );
+
+    }
+
+
+    if (nextButton) {
+
+        nextButton.addEventListener(
+            "click",
+            function () {
+
+                nextSlide();
+
+                startAutoSlide();
+
+            }
+        );
+
+    }
+
+
+    if (previousButton) {
+
+        previousButton.addEventListener(
+            "click",
+            function () {
+
+                previousSlide();
+
+                startAutoSlide();
+
+            }
+        );
+
+    }
+
+
+    dots.forEach(function (dot) {
+
+        dot.addEventListener(
+            "click",
+            function () {
+
+                const slideIndex =
+                    parseInt(
+                        dot.dataset.slide,
+                        10
+                    );
+
+                showSlide(slideIndex);
+
+                startAutoSlide();
+
+            }
+        );
+
+    });
+
+
+    showSlide(0);
+
+    startAutoSlide();
 
 });
 </script>

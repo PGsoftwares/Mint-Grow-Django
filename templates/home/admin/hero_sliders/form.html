@@ -1,0 +1,356 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}
+{{ page_title }} | Mint Grow
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header mb-3">
+
+    <div>
+
+        <h2 class="page-title">
+            {{ page_title }}
+        </h2>
+
+        <div class="text-secondary">
+            Configure homepage hero slider.
+        </div>
+
+    </div>
+
+</div>
+
+
+<form
+    method="post"
+    enctype="multipart/form-data"
+>
+
+    {% csrf_token %}
+
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                Slider Content
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+            {% if form.non_field_errors %}
+
+                <div class="alert alert-danger">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="row">
+
+
+                <div class="col-md-12 mb-3">
+
+                    <label class="form-label">
+                        Small Label
+                    </label>
+
+                    {{ form.label }}
+
+                    {% if form.label.errors %}
+                        <div class="text-danger small">
+                            {{ form.label.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Title
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    {{ form.title }}
+
+                    {% if form.title.errors %}
+                        <div class="text-danger small">
+                            {{ form.title.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Highlight Text
+                    </label>
+
+                    {{ form.highlight_text }}
+
+                </div>
+
+
+                <div class="col-md-12 mb-3">
+
+                    <label class="form-label">
+                        Description
+                    </label>
+
+                    {{ form.description }}
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card mt-3">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                Buttons
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row">
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Button 1 Text
+                    </label>
+
+                    {{ form.button1_text }}
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Button 1 URL
+                    </label>
+
+                    {{ form.button1_url }}
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Button 2 Text
+                    </label>
+
+                    {{ form.button2_text }}
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Button 2 URL
+                    </label>
+
+                    {{ form.button2_url }}
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card mt-3">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                Slider Images
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row">
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Desktop Image
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    {{ form.image }}
+
+                    <div class="form-hint">
+                        Recommended: 1920 × 800 px
+                    </div>
+
+
+                    {% if slider and slider.image %}
+
+                        <div class="mt-3">
+
+                            <img
+                                src="{{ slider.image.url }}"
+                                style="
+                                    max-width: 100%;
+                                    max-height: 180px;
+                                    object-fit: cover;
+                                    border-radius: 8px;
+                                "
+                            >
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Mobile Image
+                    </label>
+
+                    {{ form.mobile_image }}
+
+                    <div class="form-hint">
+                        Optional. Recommended: 800 × 1000 px
+                    </div>
+
+
+                    {% if slider and slider.mobile_image %}
+
+                        <div class="mt-3">
+
+                            <img
+                                src="{{ slider.mobile_image.url }}"
+                                style="
+                                    max-width: 200px;
+                                    max-height: 180px;
+                                    object-fit: cover;
+                                    border-radius: 8px;
+                                "
+                            >
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card mt-3">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                Display Settings
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row">
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Sort Order
+                    </label>
+
+                    {{ form.sort_order }}
+
+                    <div class="form-hint">
+                        Lower numbers appear first.
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    {{ form.status }}
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="mt-3">
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Save Slider
+        </button>
+
+
+        <a
+            href="{% url 'admin_hero_slider_list' %}"
+            class="btn btn-secondary"
+        >
+            Cancel
+        </a>
+
+    </div>
+
+
+</form>
+
+{% endblock %}

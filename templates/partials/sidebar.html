@@ -208,6 +208,54 @@
                 </li>
 
                 <li class="nav-item">
+
+                    <a
+                        class="nav-link {% if request.resolver_match.url_name == 'admin_hero_slider_list' or request.resolver_match.url_name == 'admin_hero_slider_create' or request.resolver_match.url_name == 'admin_hero_slider_edit' %}active{% endif %}"
+                        href="{% url 'admin_hero_slider_list' %}"
+                    >
+
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icon-tabler-slideshow"
+                            >
+                                <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"
+                                />
+
+                                <path d="M15 6l.01 0" />
+
+                                <path d="M15 3h-10a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10a2 2 0 0 0 -2 -2z" />
+
+                                <path d="M7 20h10" />
+
+                                <path d="M17 3l4 4" />
+
+                                <path d="M7 9l3 3l2 -2l3 3" />
+                            </svg>
+
+                        </span>
+
+                        <span class="nav-link-title">
+                            Hero Sliders
+                        </span>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
                     <form
                         method="post"
                         action="{% url 'logout' %}"

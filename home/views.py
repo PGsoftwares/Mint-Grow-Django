@@ -1,12 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Min, Max, Prefetch
-
-from categories.models import ProductCategory
-from products.models import Product, ProductPriceVariation
 
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+
+from categories.models import ProductCategory
+from products.models import Product, ProductPriceVariation
+
+from .forms import HeroSliderForm
+from .models import HeroSlider
 
 
 def home_view(request):
@@ -17,7 +20,7 @@ def home_view(request):
             status="active",
             parent__isnull=True,
         )
-        .order_by("name") 
+        .order_by("name")
     )
 
 
@@ -53,9 +56,23 @@ def home_view(request):
     )
 
 
+    # Active Hero Sliders
+    hero_sliders = (
+        HeroSlider.objects
+        .filter(
+            status="active"
+        )
+        .order_by(
+            "sort_order",
+            "-created_at",
+        )
+    )
+
+
     context = {
         "categories": categories,
         "products": products,
+        "hero_sliders": hero_sliders,
     }
 
 
@@ -67,6 +84,7 @@ def home_view(request):
 
 
 def about_view(request):
+
     return render(
         request,
         "home/about.html",
@@ -77,11 +95,31 @@ def contact_view(request):
 
     if request.method == "POST":
 
-        name = request.POST.get("name", "").strip()
-        email = request.POST.get("email", "").strip()
-        phone = request.POST.get("phone", "").strip()
-        enquiry_type = request.POST.get("enquiry_type", "").strip()
-        message = request.POST.get("message", "").strip()
+        name = request.POST.get(
+            "name",
+            ""
+        ).strip()
+
+        email = request.POST.get(
+            "email",
+            ""
+        ).strip()
+
+        phone = request.POST.get(
+            "phone",
+            ""
+        ).strip()
+
+        enquiry_type = request.POST.get(
+            "enquiry_type",
+            ""
+        ).strip()
+
+        message = request.POST.get(
+            "message",
+            ""
+        ).strip()
+
 
         if not all([
             name,
@@ -101,6 +139,7 @@ def contact_view(request):
                 "home/contact.html",
             )
 
+
         enquiry_type_display = dict(
             [
                 ("product", "Product Enquiry"),
@@ -114,26 +153,32 @@ def contact_view(request):
             enquiry_type,
         )
 
-        subject = f"New Contact Enquiry - {enquiry_type_display}"
+
+        subject = (
+            f"New Contact Enquiry - "
+            f"{enquiry_type_display}"
+        )
+
 
         email_message = f"""
-            You have received a new enquiry from the Mint Grow website.
+You have received a new enquiry from the Mint Grow website.
 
-            Name:
-            {name}
+Name:
+{name}
 
-            Email:
-            {email}
+Email:
+{email}
 
-            Phone:
-            {phone}
+Phone:
+{phone}
 
-            Enquiry Type:
-            {enquiry_type_display}
+Enquiry Type:
+{enquiry_type_display}
 
-            Message:
-            {message}
-            """
+Message:
+{message}
+"""
+
 
         send_mail(
             subject,
@@ -143,14 +188,165 @@ def contact_view(request):
             fail_silently=False,
         )
 
+
         messages.success(
             request,
             "Thank you! Your enquiry has been submitted successfully.",
         )
 
-        return redirect("contact")
+        return redirect(
+            "contact"
+        )
+
 
     return render(
         request,
         "home/contact.html",
+    )
+
+
+# =========================================================
+# Hero Slider Management
+# =========================================================
+
+
+def admin_hero_slider_list_view(request):
+
+    sliders = (
+        HeroSlider.objects
+        .all()
+    )
+
+
+    context = {
+        "sliders": sliders,
+    }
+
+
+    return render(
+        request,
+        "home/admin/hero_sliders/list.html",
+        context,
+    )
+
+
+def admin_hero_slider_create_view(request):
+
+    if request.method == "POST":
+
+        form = HeroSliderForm(
+            request.POST,
+            request.FILES,
+        )
+
+
+        if form.is_valid():
+
+            form.save()
+
+
+            messages.success(
+                request,
+                "Hero slider added successfully.",
+            )
+
+
+            return redirect(
+                "admin_hero_slider_list"
+            )
+
+
+    else:
+
+        form = HeroSliderForm()
+
+
+    context = {
+        "form": form,
+        "page_title": "Add Hero Slider",
+    }
+
+
+    return render(
+        request,
+        "home/admin/hero_sliders/form.html",
+        context,
+    )
+
+
+def admin_hero_slider_edit_view(request, pk):
+
+    slider = get_object_or_404(
+        HeroSlider,
+        pk=pk,
+    )
+
+
+    if request.method == "POST":
+
+        form = HeroSliderForm(
+            request.POST,
+            request.FILES,
+            instance=slider,
+        )
+
+
+        if form.is_valid():
+
+            form.save()
+
+
+            messages.success(
+                request,
+                "Hero slider updated successfully.",
+            )
+
+
+            return redirect(
+                "admin_hero_slider_list"
+            )
+
+
+    else:
+
+        form = HeroSliderForm(
+            instance=slider,
+        )
+
+
+    context = {
+        "form": form,
+        "slider": slider,
+        "page_title": "Edit Hero Slider",
+    }
+
+
+    return render(
+        request,
+        "home/admin/hero_sliders/form.html",
+        context,
+    )
+
+
+def admin_hero_slider_delete_view(request, pk):
+
+    slider = get_object_or_404(
+        HeroSlider,
+        pk=pk,
+    )
+
+
+    if request.method == "POST":
+
+        slider.delete()
+
+
+        messages.success(
+            request,
+            "Hero slider deleted successfully.",
+        )
+
+
+    return redirect(
+        "admin_hero_slider_list"
     )
