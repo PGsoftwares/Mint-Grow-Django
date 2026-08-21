@@ -241,6 +241,11 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
         <div class="section-header">
 
+            <h2 style="color: crimson; font-weight: 700; font-family: 'Poppins', sans-serif;">
+                Please place your order at least 1 day in advance to confirm stock availability.
+            </h2>
+            <br>
+
             <span class="eyebrow">
                 Our Products
             </span>
@@ -371,12 +376,7 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
                         </th>
 
 
-                        <th>
-                            Stock
-                        </th>
-
-
-                        <th>
+                        <th style="text-align: center;">
                             Qty
                         </th>
 
@@ -497,18 +497,29 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
                                         </select>
 
-                                    </td>
+                                    </td>                                 
 
 
-                                    <!-- Stock -->
-                                    <td style="text-align: center;">
+                                    <!-- Quantity -->
+                                    <td width="90px" style="text-align: center;">
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            form="cart-form-{{ product.id }}"
+                                            value="1"
+                                            min="1"
+                                            class="home-quantity-input"
+                                            id="quantity-{{ product.id }}"
+                                        >
+                                        <br>
                                         <span
                                             class="home-stock-display"
                                             id="stock-display-{{ product.id }}"
                                         >
                                             {% with variation=variations.0 %}
 
-                                                <strong class="d-block">
+                                                <strong class="d-block" style="font-size: 14px !important;">
                                                     {{ variation.stock|floatformat:-2 }}
                                                     {{ variation.get_stock_unit_display }}
                                                 </strong>
@@ -529,21 +540,6 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
 
                                             {% endwith %}
                                         </span>
-                                    </td>
-
-
-                                    <!-- Quantity -->
-                                    <td width="90px">
-
-                                        <input
-                                            type="number"
-                                            name="quantity"
-                                            form="cart-form-{{ product.id }}"
-                                            value="1"
-                                            min="1"
-                                            class="home-quantity-input"
-                                            id="quantity-{{ product.id }}"
-                                        >
 
                                     </td>
 
@@ -590,13 +586,7 @@ Mint Grow Farm provides fresh, traceable and responsibly sourced agricultural pr
                                             No variations
                                         </span>
 
-                                    </td>
-
-
-                                    <!-- Stock -->
-                                    <td>
-                                        —
-                                    </td>
+                                    </td>                                   
 
 
                                     <!-- Quantity -->

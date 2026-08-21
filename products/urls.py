@@ -49,4 +49,11 @@ urlpatterns = [
         views.product_delete_view,
         name="product_delete",
     ),
+    
+    # Public Excel download
+    path(
+        "download-price-list/",
+        views.download_price_list_view,
+        name="download_price_list",
+    ),
 ]

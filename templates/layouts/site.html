@@ -11,7 +11,7 @@
 
     <title>{% block title %}Mint Grow Farm{% endblock %}</title>
 
-    <link rel="icon" type="image/x-icon" href="{% static 'tabler/img/logo.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'tabler/img/fav-icon.png' %}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -86,10 +86,20 @@
                         {% endif %} -->
                     </a>
                 </li>
+                <li>
+                    
+                </li>
+                
                 
             </ul>
 
             <div class="nav-actions">
+
+                <a href="{% url 'download_price_list' %}"
+                    class="primary-btn">
+                        <i class="ti ti-file-spreadsheet me-1"></i>
+                        Download Price List
+                    </a>
 
                 {% if request.user.is_authenticated %}
 

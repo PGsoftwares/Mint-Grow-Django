@@ -9,6 +9,11 @@ from accounts.decorators import admin_required
 from .forms import ProductForm, ProductPriceVariationFormSet
 from .models import Product, ProductCategory
 
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
+from datetime import date
 
 def public_product_list_view(request):
 
@@ -90,7 +95,141 @@ def public_product_detail_view(request, slug):
     )
     
 
-@admin_required
+def download_price_list_view(request):
+    """
+    Generate and download the public product price list as Excel.
+    Only active products and active categories are included.
+    """
+
+    products = (
+        Product.objects
+        .select_related("category")
+        .prefetch_related("price_variations")
+        .filter(
+            status="active",
+            category__status="active",
+        )
+        .order_by(
+            "category__name",
+            "name",
+        )
+    )
+
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Price List"
+
+    # Excel headers
+    headers = [
+        "Category",
+        "Product",
+        "SKU",
+        "Variation",
+        "Price",
+        "Stock",
+        "Unit",
+        "Stock Status",
+    ]
+
+    worksheet.append(headers)
+
+    # Header styling
+    header_fill = PatternFill(
+        fill_type="solid",
+        fgColor="65A832",
+    )
+
+    header_font = Font(
+        bold=True,
+        color="FFFFFF",
+    )
+
+    for cell in worksheet[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+        )
+
+    # Product + variation data
+    for product in products:
+
+        variations = product.price_variations.all()
+
+        for variation in variations:
+
+            worksheet.append([
+                product.category.name,
+                product.name,
+                product.sku or "",
+                variation.name,
+                variation.price,
+                variation.stock,
+                variation.get_stock_unit_display(),
+                "In Stock" if variation.in_stock else "Out of Stock",
+            ])
+
+    # Format Price column
+    for cell in worksheet["E"][1:]:
+        cell.number_format = '[$₹-en-IN]#,##0.00'
+
+    # Format Stock column
+    for cell in worksheet["F"][1:]:
+        cell.number_format = '0.00'
+
+    # Freeze header row
+    worksheet.freeze_panes = "A2"
+
+    # Add filters
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    # Header row height
+    worksheet.row_dimensions[1].height = 25
+
+    # Auto-width columns
+    for column_cells in worksheet.columns:
+
+        max_length = 0
+
+        column_letter = get_column_letter(
+            column_cells[0].column
+        )
+
+        for cell in column_cells:
+
+            if cell.value is not None:
+                max_length = max(
+                    max_length,
+                    len(str(cell.value)),
+                )
+
+        worksheet.column_dimensions[
+            column_letter
+        ].width = min(
+            max_length + 3,
+            40,
+        )
+
+    # Create downloadable response
+    response = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-"
+            "officedocument.spreadsheetml.sheet"
+        )
+    )
+
+    today = date.today().strftime("%Y-%m-%d")
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="Mint-Grow-Price-List-{today}.xlsx"'
+    )
+
+    workbook.save(response)
+
+    return response
+
+
 @admin_required
 def product_list_view(request):
 
