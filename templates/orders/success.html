@@ -6,40 +6,30 @@ Order Successful | Mint Grow Farm
 
 {% block content %}
 
-<section class="section">
+<section class="section cart-section">
     <div class="container">
-
-        <div class="order-success">
-
+        <div class="empty-cart">
             <div class="order-success-icon">
                 ✓
             </div>
 
-            <h1>
+            <h3>
                 Order Placed Successfully
-            </h1>
+            </h3>
 
             <p>
-                Thank you for your order.
+                Thank you for your order. We are processing it and will deliver it soon.
             </p>
 
             <div class="order-number">
                 Order Number
-
-                <strong>
-                    {{ order_number }}
-                </strong>
+                <strong>{{ order_number }}</strong>
             </div>
 
-            <a
-                href="{% url 'public_product_list' %}"
-                class="btn btn-primary"
-            >
+            <a href="{% url 'public_product_list' %}" class="btn btn-primary">
                 Continue Shopping
             </a>
-
         </div>
-
     </div>
 </section>
 

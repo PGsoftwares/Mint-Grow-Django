@@ -285,6 +285,7 @@ Checkout | Mint Grow Farm
 
                         <button
                             type="submit"
+                            id="checkout-submit"
                             class="btn btn-primary w-100"
                         >
                             Place Order
@@ -301,5 +302,44 @@ Checkout | Mint Grow Farm
     </div>
 
 </section>
+
+
+<script>
+
+    const paymentMethod =
+        document.getElementById("id_payment_method");
+
+    const submitButton =
+        document.getElementById("checkout-submit");
+
+
+    function updatePaymentButton() {
+
+        if (
+            paymentMethod.value === "razorpay"
+        ) {
+
+            submitButton.textContent =
+                "Proceed to Payment";
+
+        } else {
+
+            submitButton.textContent =
+                "Place Order";
+
+        }
+
+    }
+
+
+    paymentMethod.addEventListener(
+        "change",
+        updatePaymentButton
+    );
+
+
+    updatePaymentButton();
+
+</script>
 
 {% endblock %}

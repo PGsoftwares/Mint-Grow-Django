@@ -2,7 +2,7 @@ import uuid
 
 from django.db import models
 
-from products.models import Product
+from products.models import Product, ProductPriceVariation
 
 
 def generate_order_number():
@@ -22,6 +22,7 @@ class Order(models.Model):
 
     PAYMENT_METHOD_CHOICES = (
         ("cod", "Cash on Delivery"),
+        ('razorpay','Online Payment')
     )
 
     order_number = models.CharField(
@@ -65,6 +66,35 @@ class Order(models.Model):
         choices=PAYMENT_METHOD_CHOICES,
         default="cod",
     )
+    
+    payment_status = models.CharField(
+        max_length=20,
+        choices=(
+            ("pending", "Pending"),
+            ("paid", "Paid"),
+            ("failed", "Failed"),
+            ("refunded", "Refunded"),
+        ),
+        default="pending",
+    )
+
+    razorpay_order_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+
+    razorpay_payment_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+
+    razorpay_signature = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+    )
 
     total_amount = models.DecimalField(
         max_digits=12,
@@ -106,6 +136,13 @@ class OrderItem(models.Model):
         on_delete=models.PROTECT,
     )
 
+    variation = models.ForeignKey(
+        ProductPriceVariation,
+        on_delete=models.PROTECT,
+        related_name="order_items",
+        null=True,
+        blank=True,
+    )
     product_name = models.CharField(
         max_length=255
     )

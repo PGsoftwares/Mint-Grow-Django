@@ -45,6 +45,12 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+RAZORPAY_ENVIRONMENT = os.getenv("RAZORPAY_ENVIRONMENT", "test")
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
 
 # Application definition
 

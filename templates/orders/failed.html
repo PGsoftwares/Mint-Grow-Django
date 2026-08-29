@@ -1,0 +1,41 @@
+{% extends "layouts/site.html" %}
+
+{% block title %}
+Payment Failed | Mint Grow Farm
+{% endblock %}
+
+{% block content %}
+
+<section class="section cart-section">
+    <div class="container">
+        <div class="empty-cart">
+            <div class="order-success-icon" style="background: #dc2626;">
+                ✗
+            </div>
+
+            <h3>
+                Payment Failed or Cancelled
+            </h3>
+
+            <p>
+                We could not process your online payment. No money was charged, or any debited amount will be refunded.
+            </p>
+
+            <div class="order-number">
+                Order Number
+                <strong>{{ order_number }}</strong>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'checkout' %}" class="btn btn-primary">
+                    Try Again
+                </a>
+                <a href="{% url 'cart_detail' %}" class="btn product-back-btn">
+                    View Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

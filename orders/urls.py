@@ -40,6 +40,12 @@ urlpatterns = [
         views.order_success,
         name="order_success",
     ),
+
+    path(
+        "order/failed/<str:order_number>/",
+        views.order_failed,
+        name="order_failed",
+    ),
     
     # Admin Order Management
     path(
@@ -58,5 +64,23 @@ urlpatterns = [
         "admin/orders/<int:order_id>/status/",
         views.admin_order_status_update,
         name="admin_order_status_update",
+    ),
+    
+    path(
+        "payment/success/",
+        views.razorpay_payment_success,
+        name="razorpay_payment_success",
+    ),
+
+    path(
+        "payment/failed/",
+        views.razorpay_payment_failed,
+        name="razorpay_payment_failed",
+    ),
+
+    path(
+        "payment/cancel/",
+        views.razorpay_payment_cancel,
+        name="razorpay_payment_cancel",
     ),
 ]

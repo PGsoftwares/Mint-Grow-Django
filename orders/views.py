@@ -1,5 +1,6 @@
 from decimal import Decimal
-
+import razorpay
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import (
@@ -305,11 +306,10 @@ def checkout(request):
             continue
 
         price = variation.price
+
         quantity = item["quantity"]
 
-        item_total = (
-            price * quantity
-        )
+        item_total = price * quantity
 
         total += item_total
 
@@ -334,7 +334,6 @@ def checkout(request):
             "public_product_list"
         )
 
-
     if request.method == "POST":
 
         form = CheckoutForm(
@@ -349,9 +348,7 @@ def checkout(request):
 
                     locked_items = []
 
-                    total = Decimal(
-                        "0.00"
-                    )
+                    total = Decimal("0.00")
 
                     # Re-check and lock stock
                     for item in cart_items:
@@ -360,15 +357,11 @@ def checkout(request):
                             ProductPriceVariation.objects
                             .select_for_update()
                             .get(
-                                id=item[
-                                    "variation"
-                                ].id
+                                id=item["variation"].id
                             )
                         )
 
-                        quantity = item[
-                            "quantity"
-                        ]
+                        quantity = item["quantity"]
 
                         if variation.stock <= 0:
 
@@ -393,7 +386,6 @@ def checkout(request):
                                 )
                             )
 
-                        # Always use current price
                         price = variation.price
 
                         item_total = (
@@ -412,16 +404,16 @@ def checkout(request):
                             }
                         )
 
-
-                    # Create order
+                    # Create Django order
                     order = form.save(
                         commit=False
                     )
 
                     order.total_amount = total
 
-                    order.save()
+                    order.payment_status = "pending"
 
+                    order.save()
 
                     # Create order items
                     for item in locked_items:
@@ -429,6 +421,7 @@ def checkout(request):
                         OrderItem.objects.create(
                             order=order,
                             product=item["product"],
+                            variation=item["variation"],
                             product_name=item["product"].name,
                             variation_name=item["variation"].name,
                             unit=item["variation"].stock_unit,
@@ -437,15 +430,17 @@ def checkout(request):
                             total=item["total"],
                         )
 
+                # --------------------------------
+                # CASH ON DELIVERY
+                # --------------------------------
 
-                        # Reduce stock
-                        variation = item[
-                            "variation"
-                        ]
+                if order.payment_method == "cod":
 
-                        variation.stock -= item[
-                            "quantity"
-                        ]
+                    for item in locked_items:
+
+                        variation = item["variation"]
+
+                        variation.stock -= item["quantity"]
 
                         variation.save(
                             update_fields=[
@@ -454,20 +449,76 @@ def checkout(request):
                             ]
                         )
 
+                    order.payment_status = "pending"
+
+                    order.save(
+                        update_fields=[
+                            "payment_status",
+                            "updated_at",
+                        ]
+                    )
 
                     cart.clear()
 
+                    messages.success(
+                        request,
+                        "Order placed successfully.",
+                    )
 
-                messages.success(
-                    request,
-                    "Order placed successfully.",
-                )
+                    return redirect(
+                        "order_success",
+                        order_number=order.order_number,
+                    )
 
-                return redirect(
-                    "order_success",
-                    order_number=order.order_number,
-                )
+                # --------------------------------
+                # RAZORPAY
+                # --------------------------------
 
+                if order.payment_method == "razorpay":
+
+                    client = razorpay.Client(
+                        auth=(
+                            settings.RAZORPAY_KEY_ID,
+                            settings.RAZORPAY_KEY_SECRET,
+                        )
+                    )
+
+                    razorpay_order = client.order.create(
+                        {
+                            "amount": int(
+                                total * Decimal("100")
+                            ),
+                            "currency": "INR",
+                            "receipt": order.order_number,
+                        }
+                    )
+
+                    order.razorpay_order_id = (
+                        razorpay_order["id"]
+                    )
+
+                    order.save(
+                        update_fields=[
+                            "razorpay_order_id",
+                            "updated_at",
+                        ]
+                    )
+
+                    context = {
+                        "order": order,
+                        "razorpay_order_id": razorpay_order["id"],
+                        "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+                        "amount": int(
+                            total * Decimal("100")
+                        ),
+                        "currency": "INR",
+                    }
+
+                    return render(
+                        request,
+                        "orders/payment.html",
+                        context,
+                    )
 
             except ValueError as error:
 
@@ -478,6 +529,20 @@ def checkout(request):
 
                 return redirect(
                     "cart_detail"
+                )
+
+            except Exception as error:
+
+                messages.error(
+                    request,
+                    (
+                        "Unable to create payment. "
+                        "Please try again."
+                    ),
+                )
+
+                return redirect(
+                    "checkout"
                 )
 
     else:
@@ -496,7 +561,6 @@ def checkout(request):
             initial=initial
         )
 
-
     context = {
         "form": form,
         "cart_items": cart_items,
@@ -509,7 +573,208 @@ def checkout(request):
         context,
     )
 
+@require_POST
+def razorpay_payment_success(request):
 
+    razorpay_payment_id = request.POST.get(
+        "razorpay_payment_id"
+    )
+
+    razorpay_order_id = request.POST.get(
+        "razorpay_order_id"
+    )
+
+    razorpay_signature = request.POST.get(
+        "razorpay_signature"
+    )
+
+    if not all(
+        [
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature,
+        ]
+    ):
+
+        messages.error(
+            request,
+            "Invalid payment response.",
+        )
+
+        return redirect(
+            "public_product_list"
+        )
+
+    order = get_object_or_404(
+        Order,
+        razorpay_order_id=razorpay_order_id,
+    )
+
+    # Already paid
+    if order.payment_status == "paid":
+
+        return redirect(
+            "order_success",
+            order_number=order.order_number,
+        )
+
+    client = razorpay.Client(
+        auth=(
+            settings.RAZORPAY_KEY_ID,
+            settings.RAZORPAY_KEY_SECRET,
+        )
+    )
+
+    try:
+
+        # Verify Razorpay payment signature
+        client.utility.verify_payment_signature(
+            {
+                "razorpay_order_id": razorpay_order_id,
+                "razorpay_payment_id": razorpay_payment_id,
+                "razorpay_signature": razorpay_signature,
+            }
+        )
+
+    except razorpay.errors.SignatureVerificationError:
+
+        order.payment_status = "failed"
+
+        order.save(
+            update_fields=[
+                "payment_status",
+                "updated_at",
+            ]
+        )
+
+        messages.error(
+            request,
+            "Payment verification failed.",
+        )
+
+        return redirect(
+            "checkout"
+        )
+
+    # --------------------------------
+    # Payment verified successfully
+    # --------------------------------
+
+    try:
+
+        with transaction.atomic():
+
+            locked_order = (
+                Order.objects
+                .select_for_update()
+                .get(
+                    id=order.id
+                )
+            )
+
+            # Prevent duplicate processing
+            if locked_order.payment_status == "paid":
+
+                return redirect(
+                    "order_success",
+                    order_number=locked_order.order_number,
+                )
+
+            # Get order items
+            order_items = (
+                OrderItem.objects
+                .filter(
+                    order=locked_order
+                )
+            )
+
+            # Lock all product variations and check/reduce stock
+            for item in order_items:
+
+                variation = (
+                    ProductPriceVariation.objects
+                    .select_for_update()
+                    .get(
+                        id=item.variation_id
+                    )
+                )
+
+                if variation.stock <= 0:
+
+                    raise ValueError(
+                        (
+                            f"{item.product_name} - "
+                            f"{item.variation_name} "
+                            f"is no longer available."
+                        )
+                    )
+
+                if item.quantity > variation.stock:
+
+                    raise ValueError(
+                        (
+                            f"Insufficient stock for "
+                            f"{item.product_name} - "
+                            f"{item.variation_name}."
+                        )
+                    )
+
+                variation.stock -= item.quantity
+
+                variation.save(
+                    update_fields=[
+                        "stock",
+                        "updated_at",
+                    ]
+                )
+
+            # Save payment details
+            locked_order.razorpay_payment_id = (
+                razorpay_payment_id
+            )
+
+            locked_order.razorpay_signature = (
+                razorpay_signature
+            )
+
+            locked_order.payment_status = "paid"
+
+            locked_order.save(
+                update_fields=[
+                    "razorpay_payment_id",
+                    "razorpay_signature",
+                    "payment_status",
+                    "updated_at",
+                ]
+            )
+
+        # Clear cart only after successful payment
+        cart = Cart(request)
+
+        cart.clear()
+
+        messages.success(
+            request,
+            "Payment successful. Your order has been placed.",
+        )
+
+        return redirect(
+            "order_success",
+            order_number=locked_order.order_number,
+        )
+
+    except ValueError as error:
+
+        messages.error(
+            request,
+            str(error),
+        )
+
+        return redirect(
+            "checkout"
+        )
+        
+        
 def order_success(
     request,
     order_number,
@@ -522,12 +787,80 @@ def order_success(
             "order_number": order_number,
         },
     )
+def order_failed(
+    request,
+    order_number,
+):
+
+    return render(
+        request,
+        "orders/failed.html",
+        {
+            "order_number": order_number,
+        },
+    )
+    
+@require_POST
+def razorpay_payment_cancel(request):
+
+    order_number = request.POST.get(
+        "order_number"
+    )
+
+    if order_number:
+        # Delete pending order if user cancelled / closed the checkout modal
+        Order.objects.filter(
+            order_number=order_number,
+            payment_method="razorpay",
+            payment_status="pending",
+        ).delete()
+
+    messages.info(
+        request,
+        "Payment was cancelled. You can retry or choose another payment method.",
+    )
+
+    return redirect(
+        "checkout"
+    )
+
+@require_POST
+def razorpay_payment_failed(request):
+
+    order_number = request.POST.get(
+        "order_number"
+    )
+
+    if order_number:
+
+        order = Order.objects.filter(
+            order_number=order_number
+        ).first()
+
+        if order:
+
+            order.payment_status = "failed"
+
+            order.save(
+                update_fields=[
+                    "payment_status",
+                    "updated_at",
+                ]
+            )
+
+    return redirect(
+        "order_failed",
+        order_number=order_number or "unknown",
+    )
     
 @admin_required
 def admin_order_list(request):
     orders = (
         Order.objects
-        .all()
+        .exclude(
+            payment_method="razorpay",
+            payment_status="pending",
+        )
         .prefetch_related("items")
         .order_by("-created_at")
     )
