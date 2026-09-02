@@ -337,8 +337,26 @@ Checkout | Mint Grow Farm
         updatePaymentButton
     );
 
-
     updatePaymentButton();
+
+    const checkoutForm = document.querySelector(".checkout-form");
+    if (checkoutForm) {
+        checkoutForm.addEventListener("submit", function () {
+            if (this.checkValidity()) {
+                const isOnline = paymentMethod && paymentMethod.value === "razorpay";
+                if (submitButton && !submitButton.classList.contains("btn-loading")) {
+                    submitButton.classList.add("btn-loading");
+                    submitButton.innerHTML = '<span class="btn-spinner"></span> ' + (isOnline ? 'Connecting to Payment...' : 'Placing Order...');
+                }
+                if (typeof window.showPreloader === "function") {
+                    window.showPreloader(
+                        isOnline ? "Connecting to Payment Gateway..." : "Placing Your Order...",
+                        isOnline ? "Please wait while we initialize secure payment..." : "Please wait while we generate order details and send confirmations."
+                    );
+                }
+            }
+        });
+    }
 
 </script>
 

@@ -1,0 +1,21 @@
+Thank You for Contacting Mint Grow
+=======================================
+
+Dear {{ name }},
+
+Thank you for contacting Mint Grow. We have received your message regarding {{ enquiry_type_display }}. Our team will review your requirement and get back to you shortly.
+
+YOUR DETAILS:
+---------------------------------------
+Enquiry Type: {{ enquiry_type_display }}
+Phone:        {{ phone }}
+
+YOUR MESSAGE:
+---------------------------------------
+{{ message }}
+
+If you need immediate assistance, please call us at +91 96291 66711.
+
+Thank you,
+Mint Grow Farm
+Growing goodness.

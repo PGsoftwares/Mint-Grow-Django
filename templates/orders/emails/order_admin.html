@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>New Order Alert - Mint Grow Admin</title>
+    <style>
+        body, table, td, a { -webkit-text-size-adjust: 100%; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        @media screen and (max-width: 600px) {
+            .email-container { width: 100% !important; margin: auto !important; }
+            .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; }
+            .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; color: #334155;">
+
+    <!-- Wrapper -->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; padding: 24px 0;">
+        <tr>
+            <td align="center">
+                <!-- Container (600px) -->
+                <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                    
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td align="center" style="padding: 28px 32px 20px 32px; background-color: #ffffff; border-bottom: 1px solid #f1f5f9;">
+                            <table border="0" cellpadding="0" cellspacing="0" align="center">
+                                <tr>
+                                    <td align="center">
+                                        <img src="{{ logo_url }}" alt="Mint Grow" width="140" style="display: block; max-width: 140px; height: auto; margin: 0 auto 8px auto;" />
+                                        <div style="font-size: 13px; color: #16a34a; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">Admin Order Notification</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Hero Banner -->
+                    <tr>
+                        <td style="padding: 28px 32px 20px 32px; background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%); text-align: center;">
+                            <div style="display: inline-block; background-color: #0f766e; color: #ffffff; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                                🔔 New Order Received
+                            </div>
+                            <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #0f172a;">
+                                Order #{{ order.order_number }}
+                            </h1>
+                            <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 22px; color: #475569;">
+                                A new customer order of <strong>₹{{ order.total_amount }}</strong> has been placed by <strong>{{ order.name }}</strong>.
+                            </p>
+                            {% if admin_order_url %}
+                            <div style="margin-top: 14px;">
+                                <a href="{{ admin_order_url }}" style="display: inline-block; background-color: #16a34a; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 10px 22px; border-radius: 8px; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);">
+                                    View Order in Dashboard &rarr;
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Order Details Meta Grid -->
+                    <tr>
+                        <td style="padding: 0 32px 24px 32px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; padding: 16px;">
+                                <tr>
+                                    <td class="stack-column" width="50%" style="padding: 6px 10px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 500;">Order Number</div>
+                                        <div style="font-size: 14px; color: #0f172a; font-weight: 700; font-family: monospace;">{{ order.order_number }}</div>
+                                    </td>
+                                    <td class="stack-column" width="50%" style="padding: 6px 10px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 500;">Order Date</div>
+                                        <div style="font-size: 14px; color: #0f172a; font-weight: 600;">{{ order.created_at|date:"M d, Y, h:i A" }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="stack-column" width="50%" style="padding: 6px 10px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 500;">Payment Method</div>
+                                        <div style="font-size: 14px; color: #0f172a; font-weight: 600;">{{ order.get_payment_method_display }}</div>
+                                    </td>
+                                    <td class="stack-column" width="50%" style="padding: 6px 10px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 500;">Payment Status</div>
+                                        {% if order.payment_status == 'paid' %}
+                                        <div style="font-size: 14px; font-weight: 600; color: #15803d;">
+                                            {{ order.get_payment_status_display }}
+                                        </div>
+                                        {% else %}
+                                        <div style="font-size: 14px; font-weight: 600; color: #b45309;">
+                                            {{ order.get_payment_status_display }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Order Items Section -->
+                    <tr>
+                        <td style="padding: 0 32px 24px 32px;">
+                            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #0f172a;">
+                                Ordered Products
+                            </h2>
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                                <thead>
+                                    <tr style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                        <th align="left" style="padding: 10px 14px; font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase;">Item</th>
+                                        <th align="center" style="padding: 10px 14px; font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase;">Qty</th>
+                                        <th align="right" style="padding: 10px 14px; font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase;">Price</th>
+                                        <th align="right" style="padding: 10px 14px; font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.items.all %}
+                                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                                        <td style="padding: 12px 14px; font-size: 14px; color: #1e293b; vertical-align: middle;">
+                                            <div style="font-weight: 600;">{{ item.product_name }}</div>
+                                            {% if item.variation_name %}
+                                            <div style="font-size: 12px; color: #64748b;">
+                                                Variation: {{ item.variation_name }}{% if item.unit %} ({{ item.unit }}){% endif %}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td align="center" style="padding: 12px 14px; font-size: 14px; color: #334155; vertical-align: middle;">
+                                            {{ item.quantity }}
+                                        </td>
+                                        <td align="right" style="padding: 12px 14px; font-size: 14px; color: #334155; vertical-align: middle; white-space: nowrap;">
+                                            ₹{{ item.price }}
+                                        </td>
+                                        <td align="right" style="padding: 12px 14px; font-size: 14px; font-weight: 600; color: #0f172a; vertical-align: middle; white-space: nowrap;">
+                                            ₹{{ item.total }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background-color: #fafafa;">
+                                        <td colspan="3" align="right" style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500;">Subtotal:</td>
+                                        <td align="right" style="padding: 10px 14px; font-size: 13px; color: #1e293b; font-weight: 600;">₹{{ order.total_amount }}</td>
+                                    </tr>
+                                    <tr style="background-color: #f0fdf4; border-top: 1px solid #bbf7d0;">
+                                        <td colspan="3" align="right" style="padding: 14px; font-size: 15px; font-weight: 700; color: #15803d;">Total Order Value:</td>
+                                        <td align="right" style="padding: 14px; font-size: 17px; font-weight: 800; color: #15803d;">₹{{ order.total_amount }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Customer & Shipping Information -->
+                    <tr>
+                        <td style="padding: 0 32px 28px 32px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td class="stack-column" width="50%" style="padding: 18px; vertical-align: top; border-right: 1px solid #e2e8f0;">
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Customer Information
+                                        </div>
+                                        <div style="font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 4px;">{{ order.name }}</div>
+                                        <div style="font-size: 13px; color: #64748b; margin-bottom: 4px;">📧 {{ order.email }}</div>
+                                        <div style="font-size: 13px; color: #64748b;">📞 {{ order.phone }}</div>
+                                    </td>
+                                    <td class="stack-column" width="50%" style="padding: 18px; vertical-align: top;">
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Shipping Details
+                                        </div>
+                                        <div style="font-size: 13px; line-height: 20px; color: #334155;">
+                                            {{ order.address }}<br>
+                                            {{ order.city }}, {{ order.state }} - {{ order.pincode }}
+                                        </div>
+                                        {% if order.notes %}
+                                        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; font-size: 12px; color: #64748b;">
+                                            <strong>Customer Note:</strong> {{ order.notes }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" style="padding: 24px 32px; background-color: #0f172a; color: #94a3b8; font-size: 12px; line-height: 18px;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 14px; margin-bottom: 4px;">Mint Grow Admin System</div>
+                            <div>Automated notification sent from Mint Grow e-commerce platform.</div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #1e293b; color: #64748b;">
+                                © {% now "Y" %} Mint Grow Farm. All rights reserved.
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

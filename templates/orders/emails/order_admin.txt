@@ -1,0 +1,39 @@
+New Order Received - Mint Grow Admin Alert
+=======================================
+
+A new order has been placed on Mint Grow Farm.
+
+ORDER DETAILS:
+---------------------------------------
+Order Number:   {{ order.order_number }}
+Order Date:     {{ order.created_at|date:"M d, Y, h:i A" }}
+Payment Method: {{ order.get_payment_method_display }}
+Payment Status: {{ order.get_payment_status_display }}
+Total Value:    ₹{{ order.total_amount }}
+
+CUSTOMER DETAILS:
+---------------------------------------
+Name:    {{ order.name }}
+Email:   {{ order.email }}
+Phone:   {{ order.phone }}
+Address: {{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}
+{% if order.notes %}Notes:   {{ order.notes }}{% endif %}
+
+ORDERED ITEMS:
+---------------------------------------
+{% for item in order.items.all %}
+* {{ item.product_name }}{% if item.variation_name %} ({{ item.variation_name }}{% if item.unit %}, {{ item.unit }}{% endif %}){% endif %}
+  Qty: {{ item.quantity }} x ₹{{ item.price }} = ₹{{ item.total }}
+{% endfor %}
+
+---------------------------------------
+Total Amount: ₹{{ order.total_amount }}
+---------------------------------------
+
+{% if admin_order_url %}
+View this order in Admin Dashboard:
+{{ admin_order_url }}
+{% endif %}
+
+--
+Mint Grow Admin Automated System

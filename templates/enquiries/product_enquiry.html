@@ -139,6 +139,7 @@ Send an enquiry about {{ product.name }} from Mint Grow Farm.
             <button
                 type="submit"
                 class="home-add-cart-btn"
+                id="enquirySubmitBtn"
             >
                 Send Enquiry
             </button>
@@ -148,6 +149,29 @@ Send an enquiry about {{ product.name }} from Mint Grow Farm.
     </div>
 
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".product-enquiry-form");
+        if (form) {
+            form.addEventListener("submit", function () {
+                if (this.checkValidity()) {
+                    const btn = document.getElementById("enquirySubmitBtn");
+                    if (btn && !btn.classList.contains("btn-loading")) {
+                        btn.classList.add("btn-loading");
+                        btn.innerHTML = '<span class="btn-spinner"></span> Sending Enquiry...';
+                    }
+                    if (typeof window.showPreloader === "function") {
+                        window.showPreloader(
+                            "Submitting Product Enquiry...",
+                            "Please wait while we process your enquiry and send email notifications."
+                        );
+                    }
+                }
+            });
+        }
+    });
+</script>
 
 
 {% if enquiry_success %}

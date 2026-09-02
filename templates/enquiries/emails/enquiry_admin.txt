@@ -1,0 +1,22 @@
+New Product Enquiry - Mint Grow
+=======================================
+
+A new enquiry has been submitted for {{ product.name }}.
+
+ENQUIRY DETAILS:
+---------------------------------------
+Product:   {{ product.name }}
+Variation: {{ variation_name }}
+Quantity:  {{ enquiry.quantity|default:"Not specified" }}
+Customer:  {{ enquiry.name }}
+Email:     {{ enquiry.email }}
+Phone:     {{ enquiry.phone }}
+
+MESSAGE:
+---------------------------------------
+{{ enquiry.message|default:"N/A" }}
+
+Submitted: {{ enquiry.created_at }}
+
+--
+Mint Grow Admin System

@@ -1,0 +1,18 @@
+New Contact Enquiry - Mint Grow
+=======================================
+
+A new enquiry has been submitted via the Mint Grow website.
+
+ENQUIRY DETAILS:
+---------------------------------------
+Enquiry Type: {{ enquiry_type_display }}
+Name:         {{ name }}
+Email:        {{ email }}
+Phone:        {{ phone }}
+
+MESSAGE:
+---------------------------------------
+{{ message }}
+
+--
+Mint Grow Admin Automated System

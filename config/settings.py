@@ -201,3 +201,6 @@ DEFAULT_FROM_EMAIL = os.getenv(
 )
 
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+
+SITE_URL = os.getenv("SITE_URL", "")
+LOGO_URL = os.getenv("LOGO_URL", "")

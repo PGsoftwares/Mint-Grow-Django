@@ -15,6 +15,7 @@ from products.models import Product, ProductPriceVariation
 from .cart import Cart
 from .forms import CheckoutForm
 from .models import Order, OrderItem
+from .emails import send_order_confirmation_emails
 from django.core.paginator import Paginator
 from django.db.models import Q
 from accounts.decorators import admin_required
@@ -460,6 +461,11 @@ def checkout(request):
 
                     cart.clear()
 
+                    send_order_confirmation_emails(
+                        order,
+                        request=request,
+                    )
+
                     messages.success(
                         request,
                         "Order placed successfully.",
@@ -752,6 +758,11 @@ def razorpay_payment_success(request):
         cart = Cart(request)
 
         cart.clear()
+
+        send_order_confirmation_emails(
+            locked_order,
+            request=request,
+        )
 
         messages.success(
             request,

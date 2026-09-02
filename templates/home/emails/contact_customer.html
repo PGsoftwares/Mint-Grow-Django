@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Thank You for Contacting Mint Grow</title>
+    <style>
+        body, table, td, a { -webkit-text-size-adjust: 100%; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        @media screen and (max-width: 600px) {
+            .email-container { width: 100% !important; margin: auto !important; }
+            .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; }
+            .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; color: #334155;">
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; padding: 24px 0;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                    
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td align="center" style="padding: 28px 32px 20px 32px; background-color: #ffffff; border-bottom: 1px solid #f1f5f9;">
+                            <table border="0" cellpadding="0" cellspacing="0" align="center">
+                                <tr>
+                                    <td align="center">
+                                        <img src="{{ logo_url }}" alt="Mint Grow" width="140" style="display: block; max-width: 140px; height: auto; margin: 0 auto 8px auto;" />
+                                        <div style="font-size: 13px; color: #16a34a; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">Growing goodness</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Hero Banner -->
+                    <tr>
+                        <td style="padding: 28px 32px 20px 32px; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%); text-align: center;">
+                            <div style="display: inline-block; background-color: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                                Message Received
+                            </div>
+                            <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #0f172a;">
+                                Thank You for Contacting Us, {{ name }}!
+                            </h1>
+                            <p style="margin: 0; font-size: 14px; line-height: 22px; color: #64748b;">
+                                We have received your message regarding <strong>{{ enquiry_type_display }}</strong>. Our team will review your requirement and get back to you shortly.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Details Summary -->
+                    <tr>
+                        <td style="padding: 0 32px 24px 32px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; padding: 16px;">
+                                <tr>
+                                    <td class="stack-column" width="50%" style="padding: 8px 10px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 500;">Enquiry Type</div>
+                                        <div style="font-size: 14px; color: #16a34a; font-weight: 700;">{{ enquiry_type_display }}</div>
+                                    </td>
+                                    <td class="stack-column" width="50%" style="padding: 8px 10px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #64748b; font-weight: 500;">Your Phone Number</div>
+                                        <div style="font-size: 14px; color: #0f172a; font-weight: 600;">{{ phone }}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Your Message Copy -->
+                    <tr>
+                        <td style="padding: 0 32px 28px 32px;">
+                            <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px;">
+                                <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    Your Message:
+                                </div>
+                                <div style="font-size: 14px; line-height: 22px; color: #334155; white-space: pre-line;">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Contact & Support -->
+                    <tr>
+                        <td align="center" style="padding: 0 32px 28px 32px;">
+                            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 14px 20px; text-align: center; font-size: 13px; color: #475569;">
+                                Need immediate assistance? Call us directly at 
+                                <a href="tel:+919629166711" style="color: #16a34a; font-weight: 600; text-decoration: none;">+91 96291 66711</a>.
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" style="padding: 24px 32px; background-color: #0f172a; color: #94a3b8; font-size: 12px; line-height: 18px;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 14px; margin-bottom: 4px;">Mint Grow Farm</div>
+                            <div>Delivering fresh, traceable and sustainable agricultural products.</div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #1e293b; color: #64748b;">
+                                © {% now "Y" %} Mint Grow Farm. All rights reserved.
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

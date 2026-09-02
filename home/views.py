@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Min, Max, Prefetch
 
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.templatetags.static import static
 
 from categories.models import ProductCategory
 from products.models import Product, ProductPriceVariation
@@ -153,49 +155,60 @@ def contact_view(request):
             enquiry_type,
         )
 
-
-        subject = (
-            f"New Contact Enquiry - "
-            f"{enquiry_type_display}"
+        admin_email = getattr(settings, "ADMIN_EMAIL", None) or settings.DEFAULT_FROM_EMAIL
+        logo_url = getattr(settings, "LOGO_URL", "") or (
+            request.build_absolute_uri(static("tabler/img/logo.png")) if request else ""
         )
 
+        email_context = {
+            "name": name,
+            "email": email,
+            "phone": phone,
+            "enquiry_type": enquiry_type,
+            "enquiry_type_display": enquiry_type_display,
+            "message": message,
+            "admin_email": admin_email,
+            "logo_url": logo_url,
+        }
 
-        email_message = f"""
-You have received a new enquiry from the Mint Grow website.
+        # Send Admin Alert Email
+        try:
+            admin_subject = f"New Contact Enquiry - {enquiry_type_display}"
+            admin_text = render_to_string("home/emails/contact_admin.txt", email_context)
+            admin_html = render_to_string("home/emails/contact_admin.html", email_context)
+            admin_email_msg = EmailMultiAlternatives(
+                subject=admin_subject,
+                body=admin_text,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[admin_email],
+            )
+            admin_email_msg.attach_alternative(admin_html, "text/html")
+            admin_email_msg.send(fail_silently=False)
+        except Exception:
+            pass
 
-Name:
-{name}
+        # Send Customer Confirmation Email
+        try:
+            cust_subject = "Thank You for Contacting Mint Grow"
+            cust_text = render_to_string("home/emails/contact_customer.txt", email_context)
+            cust_html = render_to_string("home/emails/contact_customer.html", email_context)
+            cust_email_msg = EmailMultiAlternatives(
+                subject=cust_subject,
+                body=cust_text,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email],
+            )
+            cust_email_msg.attach_alternative(cust_html, "text/html")
+            cust_email_msg.send(fail_silently=False)
+        except Exception:
+            pass
 
-Email:
-{email}
-
-Phone:
-{phone}
-
-Enquiry Type:
-{enquiry_type_display}
-
-Message:
-{message}
-"""
-
-
-        send_mail(
-            subject,
-            email_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [settings.ADMIN_EMAIL],
-            fail_silently=False,
-        )
-
-
-        messages.success(
+        return render(
             request,
-            "Thank you! Your enquiry has been submitted successfully.",
-        )
-
-        return redirect(
-            "contact"
+            "home/contact.html",
+            {
+                "contact_success": True,
+            },
         )
 
 

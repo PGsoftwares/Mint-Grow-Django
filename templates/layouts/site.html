@@ -288,7 +288,41 @@
 
     </footer>
 
+    <!-- Universal Email / Form Preloader Overlay -->
+    <div id="emailPreloader" class="email-preloader-overlay" aria-hidden="true">
+        <div class="email-preloader-card">
+            <div class="email-preloader-logo">
+                <img src="{% static 'tabler/img/logo.png' %}" alt="Mint Grow" />
+            </div>
+            <div class="email-preloader-spinner-wrap">
+                <div class="email-preloader-spinner"></div>
+            </div>
+            <h3 id="emailPreloaderTitle" class="email-preloader-title">Sending...</h3>
+            <p id="emailPreloaderDesc" class="email-preloader-desc">Please wait while we process your request.</p>
+        </div>
+    </div>
+
     <script src="{% static 'tabler/js/home.js' %}"></script>
+
+    <script>
+        window.showPreloader = function (title, desc) {
+            const preloader = document.getElementById("emailPreloader");
+            if (preloader) {
+                if (title) document.getElementById("emailPreloaderTitle").textContent = title;
+                if (desc) document.getElementById("emailPreloaderDesc").textContent = desc;
+                preloader.classList.add("active");
+                preloader.setAttribute("aria-hidden", "false");
+            }
+        };
+
+        window.hidePreloader = function () {
+            const preloader = document.getElementById("emailPreloader");
+            if (preloader) {
+                preloader.classList.remove("active");
+                preloader.setAttribute("aria-hidden", "true");
+            }
+        };
+    </script>
 
     {% block extra_js %}
     {% endblock %}
